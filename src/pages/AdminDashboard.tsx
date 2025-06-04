@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Logout, Upload } from 'lucide-react';
+import { LogOut, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const AdminDashboard = () => {
@@ -130,7 +129,7 @@ const AdminDashboard = () => {
             onClick={handleLogout}
             className="flex items-center space-x-2"
           >
-            <Logout className="h-4 w-4" />
+            <LogOut className="h-4 w-4" />
             <span>Logout</span>
           </Button>
         </div>
