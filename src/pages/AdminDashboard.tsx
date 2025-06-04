@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LogOut, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -26,6 +28,8 @@ const AdminDashboard = () => {
       image5: null as File | null,
     }
   });
+
+  const [isUploading, setIsUploading] = useState(false);
 
   const categories = [
     'budget-friendly',
@@ -73,7 +77,29 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleUpload = (e: React.FormEvent) => {
+  const uploadImage = async (file: File, fileName: string): Promise<string | null> => {
+    try {
+      const { data, error } = await supabase.storage
+        .from('design-images')
+        .upload(fileName, file);
+
+      if (error) {
+        console.error('Upload error:', error);
+        return null;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('design-images')
+        .getPublicUrl(fileName);
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Upload error:', error);
+      return null;
+    }
+  };
+
+  const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validation
@@ -86,36 +112,88 @@ const AdminDashboard = () => {
       return;
     }
 
-    // Mock upload - replace with Supabase integration
-    console.log('Uploading design:', designData);
-    
-    toast({
-      title: "Design Uploaded Successfully! 🎉",
-      description: `Design ${designData.designNo} has been added to the catalog.`,
-      className: "bg-green-50 border-green-200",
-    });
+    setIsUploading(true);
 
-    // Reset form
-    setDesignData({
-      designNo: '',
-      price: '',
-      stitches: '',
-      category: '',
-      mainImage: null,
-      secondaryImages: {
-        image1: null,
-        image2: null,
-        image3: null,
-        image4: null,
-        image5: null,
+    try {
+      // Upload main image
+      const timestamp = Date.now();
+      const mainImageFileName = `${designData.designNo}-main-${timestamp}.${designData.mainImage.name.split('.').pop()}`;
+      const mainImageUrl = await uploadImage(designData.mainImage, mainImageFileName);
+
+      if (!mainImageUrl) {
+        throw new Error('Failed to upload main image');
       }
-    });
 
-    // Reset file inputs
-    const fileInputs = document.querySelectorAll('input[type="file"]') as NodeListOf<HTMLInputElement>;
-    fileInputs.forEach(input => {
-      input.value = '';
-    });
+      // Upload secondary images
+      const secondaryImageUrls: { [key: string]: string | null } = {};
+      const secondaryImages = Object.entries(designData.secondaryImages);
+      
+      for (const [key, file] of secondaryImages) {
+        if (file) {
+          const fileName = `${designData.designNo}-${key}-${timestamp}.${file.name.split('.').pop()}`;
+          const url = await uploadImage(file, fileName);
+          secondaryImageUrls[key] = url;
+        }
+      }
+
+      // Save design data to database
+      const { data, error } = await supabase
+        .from('designs')
+        .insert({
+          design_no: designData.designNo,
+          price: parseFloat(designData.price),
+          stitches: parseInt(designData.stitches),
+          category: designData.category,
+          main_image_url: mainImageUrl,
+          secondary_image_1_url: secondaryImageUrls.image1,
+          secondary_image_2_url: secondaryImageUrls.image2,
+          secondary_image_3_url: secondaryImageUrls.image3,
+          secondary_image_4_url: secondaryImageUrls.image4,
+          secondary_image_5_url: secondaryImageUrls.image5,
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Design Uploaded Successfully! 🎉",
+        description: `Design ${designData.designNo} has been added to the catalog.`,
+        className: "bg-green-50 border-green-200",
+      });
+
+      // Reset form
+      setDesignData({
+        designNo: '',
+        price: '',
+        stitches: '',
+        category: '',
+        mainImage: null,
+        secondaryImages: {
+          image1: null,
+          image2: null,
+          image3: null,
+          image4: null,
+          image5: null,
+        }
+      });
+
+      // Reset file inputs
+      const fileInputs = document.querySelectorAll('input[type="file"]') as NodeListOf<HTMLInputElement>;
+      fileInputs.forEach(input => {
+        input.value = '';
+      });
+
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast({
+        title: "Upload Failed",
+        description: "There was an error uploading the design. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -165,6 +243,7 @@ const AdminDashboard = () => {
                     id="price"
                     name="price"
                     type="number"
+                    step="0.01"
                     placeholder="E.g., 499.99"
                     value={designData.price}
                     onChange={handleInputChange}
@@ -236,10 +315,11 @@ const AdminDashboard = () => {
               {/* Upload Button */}
               <Button 
                 type="submit" 
+                disabled={isUploading}
                 className="w-full bg-purple-600 hover:bg-purple-700 text-lg py-3"
               >
                 <Upload className="h-5 w-5 mr-2" />
-                Upload Design
+                {isUploading ? 'Uploading...' : 'Upload Design'}
               </Button>
             </form>
           </CardContent>

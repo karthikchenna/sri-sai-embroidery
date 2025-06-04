@@ -1,30 +1,93 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Design {
+  id: string;
+  design_no: string;
+  price: number;
+  stitches: number;
+  category: string;
+  main_image_url: string;
+  secondary_image_1_url: string | null;
+  secondary_image_2_url: string | null;
+  secondary_image_3_url: string | null;
+  secondary_image_4_url: string | null;
+  secondary_image_5_url: string | null;
+}
 
 const DesignDetail = () => {
   const { id } = useParams();
+  const [design, setDesign] = useState<Design | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data - replace with Supabase data once connected
-  const design = {
-    id: id,
-    designNo: 'DES001',
-    price: 299,
-    stitches: 5000,
-    category: 'budget-friendly',
-    mainImage: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    secondaryImages: [
-      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-      'https://images.unsplash.com/photo-1509631179647-0177331693ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-      'https://images.unsplash.com/photo-1564342849276-bf9ce4bf5bb8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-      'https://images.unsplash.com/photo-1594736797933-d0af501ba2fe?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
-    ]
-  };
+  useEffect(() => {
+    const fetchDesign = async () => {
+      if (!id) return;
 
-  const allImages = [design.mainImage, ...design.secondaryImages];
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('designs')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching design:', error);
+          return;
+        }
+
+        setDesign(data);
+      } catch (error) {
+        console.error('Error fetching design:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDesign();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg">Loading design...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!design) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg">Design not found.</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  const secondaryImages = [
+    design.secondary_image_1_url,
+    design.secondary_image_2_url,
+    design.secondary_image_3_url,
+    design.secondary_image_4_url,
+    design.secondary_image_5_url,
+  ].filter(Boolean);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -32,7 +95,7 @@ const DesignDetail = () => {
       
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold text-center text-purple-600 mb-8">
-          Design {design.designNo}
+          Design {design.design_no}
         </h1>
 
         <div className="max-w-6xl mx-auto">
@@ -41,24 +104,26 @@ const DesignDetail = () => {
             <div className="space-y-4">
               <div className="aspect-square overflow-hidden rounded-lg shadow-lg">
                 <img
-                  src={design.mainImage}
-                  alt={design.designNo}
+                  src={design.main_image_url}
+                  alt={design.design_no}
                   className="w-full h-full object-cover"
                 />
               </div>
               
               {/* Secondary Images Grid */}
-              <div className="grid grid-cols-2 gap-4">
-                {design.secondaryImages.slice(0, 4).map((image, index) => (
-                  <div key={index} className="aspect-square overflow-hidden rounded-lg shadow-md">
-                    <img
-                      src={image}
-                      alt={`${design.designNo} view ${index + 2}`}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                ))}
-              </div>
+              {secondaryImages.length > 0 && (
+                <div className="grid grid-cols-2 gap-4">
+                  {secondaryImages.slice(0, 4).map((image, index) => (
+                    <div key={index} className="aspect-square overflow-hidden rounded-lg shadow-md">
+                      <img
+                        src={image!}
+                        alt={`${design.design_no} view ${index + 2}`}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Design Details */}
@@ -69,7 +134,7 @@ const DesignDetail = () => {
                 <div className="space-y-4">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Design Number:</span>
-                    <span className="font-semibold">{design.designNo}</span>
+                    <span className="font-semibold">{design.design_no}</span>
                   </div>
                   
                   <div className="flex justify-between">

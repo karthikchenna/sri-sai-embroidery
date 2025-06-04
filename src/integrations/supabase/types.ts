@@ -9,7 +9,51 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      designs: {
+        Row: {
+          category: string | null
+          created_at: string
+          design_no: string | null
+          id: number
+          main_image_url: string | null
+          price: number | null
+          secondary_image_1_url: string | null
+          secondary_image_2_url: string | null
+          secondary_image_3_url: string | null
+          secondary_image_4_url: string | null
+          secondary_image_5_url: string | null
+          stitches: number | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          design_no?: string | null
+          id?: number
+          main_image_url?: string | null
+          price?: number | null
+          secondary_image_1_url?: string | null
+          secondary_image_2_url?: string | null
+          secondary_image_3_url?: string | null
+          secondary_image_4_url?: string | null
+          secondary_image_5_url?: string | null
+          stitches?: number | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          design_no?: string | null
+          id?: number
+          main_image_url?: string | null
+          price?: number | null
+          secondary_image_1_url?: string | null
+          secondary_image_2_url?: string | null
+          secondary_image_3_url?: string | null
+          secondary_image_4_url?: string | null
+          secondary_image_5_url?: string | null
+          stitches?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
