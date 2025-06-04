@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Design {
-  id: string;
+  id: number;
   design_no: string;
   price: number;
   stitches: number;
@@ -34,7 +34,7 @@ const DesignDetail = () => {
         const { data, error } = await supabase
           .from('designs')
           .select('*')
-          .eq('id', id)
+          .eq('id', parseInt(id))
           .single();
 
         if (error) {

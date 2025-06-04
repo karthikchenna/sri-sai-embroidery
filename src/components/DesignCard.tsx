@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
 interface Design {
-  id: string;
+  id: number;
   design_no: string;
   price: number;
   stitches: number;

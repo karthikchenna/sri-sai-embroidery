@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Design {
-  id: string;
+  id: number;
   design_no: string;
   price: number;
   stitches: number;
