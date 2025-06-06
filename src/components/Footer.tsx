@@ -66,7 +66,7 @@ const Footer = () => {
                 <p>
                   <a href="https://maps.app.goo.gl/F8Ms9Vs4hNVt9f1s6" target="_blank" rel="noopener noreferrer" className="hover:text-white flex items-start">
                     <MapPin className="h-5 w-5 mr-2 mt-0.5 shrink-0" />
-                    Beside ZPHS, Siripuram, Sangaredddy Dist. PIN:502314
+                    Beside ZPHS, Siripuram, Dist: Sangaredddy. PIN:502314
                   </a>
                 </p>
                 <p>

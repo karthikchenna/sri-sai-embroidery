@@ -49,7 +49,7 @@ const ContactSection = () => {
                   <h4 className="font-semibold text-gray-800">Store Address</h4>
                   <p className="text-gray-600 hover:text-purple-600">
                     <a href="https://maps.app.goo.gl/F8Ms9Vs4hNVt9f1s6" target="_blank" rel="noopener noreferrer">
-                      Beside ZPHS, Siripuram, Sangaredddy Dist. PIN:502314
+                      Beside ZPHS, Siripuram, Dist: Sangaredddy. PIN:502314
                     </a>
                   </p>
                 </div>
