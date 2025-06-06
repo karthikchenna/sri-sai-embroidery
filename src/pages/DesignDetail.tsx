@@ -173,10 +173,10 @@ const DesignDetail = () => {
               <h3 className="text-xl font-bold text-gray-800 mb-3">Product Information</h3>
               <ul className="text-gray-600 space-y-2">
                 <li>• High-quality embroidery design</li>
-                <li>• Digital format compatible with most machines</li>
-                <li>• Instant download after purchase</li>
-                <li>• Detailed stitch information included</li>
-                <li>• Customer support available</li>
+                <li>• Neat stitching and fine finishing</li>
+                <li>• Durable, colorfast threads used</li>
+                <li>• Suitable for all fabric types</li>
+                <li>• Intricate detailing with precision</li>
               </ul>
             </div>
           </div>
