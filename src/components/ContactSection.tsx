@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,91 +31,104 @@ const ContactSection = () => {
   };
 
   return (
-    <section className="py-16 bg-white">
+    <section id="contact" className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl font-bold text-center text-purple-600 mb-12">
+        <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
           Contact Us
         </h2>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Contact Information */}
-          <div className="space-y-8">
-            <h3 className="text-2xl font-semibold text-gray-800 mb-6">Get In Touch</h3>
-            
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h3 className="text-2xl font-semibold text-purple-800 mb-6">Get In Touch</h3>
+
             <div className="space-y-6">
               <div className="flex items-start space-x-4">
                 <MapPin className="h-6 w-6 text-purple-600 mt-1" />
                 <div>
                   <h4 className="font-semibold text-gray-800">Store Address</h4>
-                  <p className="text-gray-600">
-                    Beside ZPHS, Siripuram, Sangaredddy Dist. PIN:502314
+                  <p className="text-gray-600 hover:text-purple-600">
+                    <a href="https://maps.app.goo.gl/F8Ms9Vs4hNVt9f1s6" target="_blank" rel="noopener noreferrer">
+                      Beside ZPHS, Siripuram, Sangaredddy Dist. PIN:502314
+                    </a>
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-start space-x-4">
                 <Mail className="h-6 w-6 text-purple-600 mt-1" />
                 <div>
                   <h4 className="font-semibold text-gray-800">Email</h4>
-                  <p className="text-gray-600">contact@saisaienbroidery.com</p>
+                  <p className="text-gray-600 hover:text-purple-600">
+                    <a href="mailto:contact@saisaienbroidery.com">
+                      contact@saisaienbroidery.com
+                    </a>
+                  </p>
                 </div>
               </div>
-              
+
               <div className="flex items-start space-x-4">
                 <Phone className="h-6 w-6 text-purple-600 mt-1" />
                 <div>
                   <h4 className="font-semibold text-gray-800">Phone</h4>
-                  <p className="text-gray-600">+91 8008105796, +91 9951455102</p>
+                  <div className="text-gray-600 space-y-1">
+                    <p className="hover:text-purple-600"><a href="tel:+918008105796">+91 8008105796</a></p>
+                    <p className="hover:text-purple-600"><a href="tel:+919951455102">+91 9951455102</a></p>
+                  </div>
                 </div>
               </div>
-              
+
               <div className="flex items-start space-x-4">
                 <Instagram className="h-6 w-6 text-purple-600 mt-1" />
                 <div>
                   <h4 className="font-semibold text-gray-800">Instagram</h4>
-                  <p className="text-gray-600">@saisaienbroidery</p>
+                  <p className="text-gray-600 hover:text-purple-600">
+                    <a href="https://www.instagram.com/srisaiembrodiery/" target="_blank" rel="noopener noreferrer">
+                      @srisaiembroidery
+                    </a>
+                  </p>
                 </div>
               </div>
             </div>
           </div>
-          
+
           {/* Contact Form */}
-          <div>
-            <h3 className="text-2xl font-semibold text-gray-800 mb-6">Send Us a Message</h3>
-            
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h3 className="text-2xl font-semibold text-purple-800 mb-6">Send Us a Message</h3>
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Input
                   type="text"
                   name="name"
-                  placeholder="Your Name"
+                  placeholder="Enter your name"
                   value={formData.name}
                   onChange={handleChange}
                   required
                 />
               </div>
-              
+
               <div>
                 <Input
                   type="email"
                   name="email"
-                  placeholder="Your Email"
+                  placeholder="Enter your email"
                   value={formData.email}
                   onChange={handleChange}
                   required
                 />
               </div>
-              
+
               <div>
                 <Input
                   type="tel"
                   name="phone"
-                  placeholder="Phone Number"
+                  placeholder="Enter your phone number"
                   value={formData.phone}
                   onChange={handleChange}
                 />
               </div>
-              
+
               <div>
                 <Textarea
                   name="message"
@@ -127,10 +139,11 @@ const ContactSection = () => {
                   required
                 />
               </div>
-              
-              <Button 
-                type="submit" 
-                className="w-full bg-purple-600 hover:bg-purple-700"
+
+              <Button
+                type="submit"
+                className="w-full"
+                style={{ backgroundImage: 'linear-gradient(to right, #8a2be2, #ff69b4)' }}
               >
                 Send Message
               </Button>

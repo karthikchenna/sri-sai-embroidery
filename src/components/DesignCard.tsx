@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,6 +10,7 @@ interface Design {
   stitches: number;
   category: string;
   main_image_url: string;
+  description?: string;
 }
 
 interface DesignCardProps {
@@ -24,28 +24,39 @@ const DesignCard = ({ design }: DesignCardProps) => {
     navigate(`/design/${design.id}`);
   };
 
+  // Function to format category name
+  const formatCategory = (category: string) => {
+    return category
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
   return (
-    <Card className="group cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
+    <Card 
+      onClick={handleClick}
+      className="group cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
+    >
       <CardContent className="p-0">
-        <div className="relative overflow-hidden">
+        <div className="relative overflow-hidden bg-gray-50">
           <img
             src={design.main_image_url || 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'}
             alt={design.design_no}
-            className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
+            className="w-full h-64 object-contain transition-transform duration-300 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300" />
         </div>
         
         <div className="p-4">
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">{design.design_no}</h3>
-          <p className="text-sm text-gray-600 mb-3">Stitches: {design.stitches.toLocaleString()}</p>
-          
-          <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-gray-800 mb-1">Design No: {design.design_no}</h3>
+          {design.description && <p className="text-md text-gray-600 mb-0">{design.description}</p>}
+          <p className="text-md text-gray-600 mb-0">Stitches: {design.stitches.toLocaleString()}</p>
+          <div className="flex justify-between items-center mb-1">
+            <p className="text-md text-gray-600">Category: {design.category.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</p>
             <Button 
-              onClick={handleClick}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6"
+              className="bg-purple-600 hover:bg-purple-700 text-white px-6 pointer-events-none"
             >
-              ₹{design.price}
+              ₹ {design.price}
             </Button>
           </div>
         </div>

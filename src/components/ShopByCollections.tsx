@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,49 +10,49 @@ const ShopByCollections = () => {
       id: 'budget-friendly',
       name: 'Budget Friendly',
       description: 'Affordable designs for every occasion',
-      image: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+      image: 'Assets/Photo Embrodiery.jpg'
     },
     {
       id: 'exclusive',
       name: 'Exclusive',
       description: 'Premium and unique designs',
-      image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+      image: 'Assets/All over.jpg'
     },
     {
       id: 'mirror-work',
       name: 'Mirror Work',
       description: 'Stunning mirror embroidery creations',
-      image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+      image: 'Assets/Mirror Work.jpg'
     },
     {
       id: 'lines-design',
       name: 'Lines Design',
       description: 'Geometric and linear patterns',
-      image: 'https://images.unsplash.com/photo-1564342849276-bf9ce4bf5bb8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+      image: 'Assets/Lines Design.jpg'
     },
     {
       id: 'hand-all-over',
       name: 'Hand All Over',
       description: 'Intricate hand embroidery designs',
-      image: 'https://images.unsplash.com/photo-1594736797933-d0af501ba2fe?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+      image: 'Assets/All over.jpg'
     },
     {
       id: 'kutch-work',
       name: 'Kutch Work',
       description: 'Traditional Kutch embroidery styles',
-      image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+      image: 'Assets/Kutch Work.jpg'
     },
     {
       id: 'bridal',
       name: 'Bridal',
       description: 'Luxurious designs for special occasions',
-      image: 'https://images.unsplash.com/photo-1595777216528-85e5e0c4ad9a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+      image: 'Assets/Mirror Work.jpg'
     },
     {
       id: 'embroidery-frames',
       name: 'Embroidery Frames',
       description: 'Ready-to-stick embroidery frames',
-      image: 'https://images.unsplash.com/photo-1582582621959-48d27397dc69?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+      image: 'Assets/Photo Embrodiery.jpg'
     }
   ];
 
@@ -64,11 +63,11 @@ const ShopByCollections = () => {
   return (
     <section className="py-16 bg-white">
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl font-bold text-center text-purple-600 mb-12">
+        <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
           Shop By Collections
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {collections.map((collection) => (
             <Card
               key={collection.id}

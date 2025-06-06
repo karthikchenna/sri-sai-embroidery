@@ -1,11 +1,10 @@
-
 import React from 'react';
 
 const AboutUsSection = () => {
   return (
-    <section className="py-16 bg-gray-50">
+    <section id="about" className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl font-bold text-center text-purple-600 mb-12">
+        <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
           About Us
         </h2>
         

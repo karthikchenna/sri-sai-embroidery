@@ -1,24 +1,28 @@
-
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const HeroCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const navigate = useNavigate();
 
   const slides = [
     {
-      image: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2874&q=80',
+      // image: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2874&q=80',
+      image: 'Assets/carsouel-3.png',
       title: 'Handcrafted Elegance',
       subtitle: 'Discover our premium embroidery collections'
     },
     {
-      image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2800&q=80',
+      // image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2800&q=80',
+      image: 'Assets/carsouel-6.jpg',
       title: 'Traditional Artistry',
       subtitle: 'Experience timeless beauty in every stitch'
     },
     {
-      image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2800&q=80',
+      // image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2800&q=80',
+      image: 'Assets/carsouel-5.png',
       title: 'Contemporary Designs',
       subtitle: 'Modern embroidery for today\'s fashion'
     }
@@ -44,8 +48,12 @@ const HeroCarousel = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
 
+  const handleExploreClick = () => {
+    navigate('/designs');
+  };
+
   return (
-    <section className="relative h-[600px] overflow-hidden">
+    <section id="home" className="relative h-[600px] overflow-hidden">
       {slides.map((slide, index) => (
         <div
           key={index}
@@ -66,7 +74,11 @@ const HeroCarousel = () => {
                 <p className="text-xl md:text-2xl mb-8 animate-fade-in">
                   {slide.subtitle}
                 </p>
-                <Button size="lg" className="bg-purple-600 hover:bg-purple-700 animate-fade-in">
+                <Button 
+                  size="lg" 
+                  className="bg-purple-600 hover:bg-purple-700 animate-fade-in"
+                  onClick={handleExploreClick}
+                >
                   Explore Collections
                 </Button>
               </div>

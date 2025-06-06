@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -14,6 +13,7 @@ interface Design {
   stitches: number;
   category: string;
   main_image_url: string;
+  description?: string;
 }
 
 const Designs = () => {
@@ -39,7 +39,7 @@ const Designs = () => {
       setLoading(true);
       let query = supabase
         .from('designs')
-        .select('id, design_no, price, stitches, category, main_image_url');
+        .select('id, design_no, price, stitches, category, main_image_url, description');
 
       if (activeCategory !== 'all') {
         query = query.eq('category', activeCategory);
@@ -90,12 +90,12 @@ const Designs = () => {
       <Header />
       
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-center text-purple-600 mb-8">
+        <h1 className="text-4xl font-bold text-center mb-8 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
           Our Embroidery Designs
         </h1>
 
         {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-2 mb-8">
+        <div className="flex flex-nowrap overflow-x-auto gap-2 mb-8 pb-2 -mx-4 px-4 lg:mx-0 lg:px-0 lg:justify-center">
           {categories.map((category) => (
             <Button
               key={category.id}

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -16,6 +15,7 @@ const AdminDashboard = () => {
   
   const [designData, setDesignData] = useState({
     designNo: '',
+    description: '',
     price: '',
     stitches: '',
     category: '',
@@ -141,6 +141,7 @@ const AdminDashboard = () => {
         .from('designs')
         .insert({
           design_no: designData.designNo,
+          description: designData.description,
           price: parseFloat(designData.price),
           stitches: parseInt(designData.stitches),
           category: designData.category,
@@ -165,6 +166,7 @@ const AdminDashboard = () => {
       // Reset form
       setDesignData({
         designNo: '',
+        description: '',
         price: '',
         stitches: '',
         category: '',
@@ -234,6 +236,16 @@ const AdminDashboard = () => {
                     value={designData.designNo}
                     onChange={handleInputChange}
                     required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="description">Description (Optional)</Label>
+                  <Input
+                    id="description"
+                    name="description"
+                    placeholder="Brief description of the design"
+                    value={designData.description}
+                    onChange={handleInputChange}
                   />
                 </div>
                 
