@@ -21,6 +21,7 @@ const Designs = () => {
   const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'all');
   const [designs, setDesigns] = useState<Design[]>([]);
   const [loading, setLoading] = useState(true);
+  const searchQuery = searchParams.get('search');
 
   const categories = [
     { id: 'all', name: 'All' },
@@ -41,7 +42,9 @@ const Designs = () => {
         .from('designs')
         .select('id, design_no, price, stitches, category, main_image_url, description');
 
-      if (activeCategory !== 'all') {
+      if (searchQuery) {
+        query = query.ilike('design_no', `%${searchQuery}%`);
+      } else if (activeCategory !== 'all') {
         query = query.eq('category', activeCategory);
       }
 
@@ -69,7 +72,7 @@ const Designs = () => {
 
   useEffect(() => {
     fetchDesigns();
-  }, [activeCategory]);
+  }, [activeCategory, searchQuery]);
 
   if (loading) {
     return (
@@ -91,25 +94,27 @@ const Designs = () => {
       
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold text-center mb-8 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
-          Our Embroidery Designs
+          {searchQuery ? `Search Results for "${searchQuery}"` : 'Our Embroidery Designs'}
         </h1>
 
-        {/* Category Filter */}
-        <div className="flex flex-nowrap overflow-x-auto gap-2 mb-8 pb-2 -mx-4 px-4 lg:mx-0 lg:px-0 lg:justify-center">
-          {categories.map((category) => (
-            <Button
-              key={category.id}
-              variant={activeCategory === category.id ? "default" : "outline"}
-              onClick={() => setActiveCategory(category.id)}
-              className={activeCategory === category.id 
-                ? "bg-purple-600 hover:bg-purple-700" 
-                : "border-purple-600 text-purple-600 hover:bg-purple-50"
-              }
-            >
-              {category.name}
-            </Button>
-          ))}
-        </div>
+        {/* Category Filter - Only show when not searching */}
+        {!searchQuery && (
+          <div className="flex flex-nowrap overflow-x-auto gap-2 mb-8 pb-2 -mx-4 px-4 lg:mx-0 lg:px-0 lg:justify-center">
+            {categories.map((category) => (
+              <Button
+                key={category.id}
+                variant={activeCategory === category.id ? "default" : "outline"}
+                onClick={() => setActiveCategory(category.id)}
+                className={activeCategory === category.id 
+                  ? "bg-purple-600 hover:bg-purple-700" 
+                  : "border-purple-600 text-purple-600 hover:bg-purple-50"
+                }
+              >
+                {category.name}
+              </Button>
+            ))}
+          </div>
+        )}
 
         {/* Designs Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -120,7 +125,11 @@ const Designs = () => {
 
         {designs.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">No designs found in this category.</p>
+            <p className="text-gray-500 text-lg">
+              {searchQuery 
+                ? `No designs found matching "${searchQuery}"`
+                : 'No designs found in this category.'}
+            </p>
           </div>
         )}
       </div>

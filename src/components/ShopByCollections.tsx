@@ -57,6 +57,7 @@ const ShopByCollections = () => {
   ];
 
   const handleCollectionClick = (category: string) => {
+    window.scrollTo(0, 0);
     navigate(`/designs?category=${category}`);
   };
 

@@ -14,7 +14,14 @@ const Footer = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Company Info */}
             <div>
-              <h3 className="text-xl font-bold mb-4">Sri Sai Embroidery</h3>
+              <div className="flex flex-col items-start mb-1">
+                <img 
+                  src="Assets/Logo.png" 
+                  alt="Sri Sai Embroidery Logo" 
+                  className="h-20 w-20 object-contain mb-2"
+                />
+                <h3 className="text-xl font-bold">Sri Sai Embroidery</h3>
+              </div>
               <p className="text-gray-300 mb-4">
                 Premium embroidery designs celebrating artistry, culture, and individuality.
               </p>
@@ -66,13 +73,13 @@ const Footer = () => {
                 <p>
                   <a href="https://maps.app.goo.gl/F8Ms9Vs4hNVt9f1s6" target="_blank" rel="noopener noreferrer" className="hover:text-white flex items-start">
                     <MapPin className="h-5 w-5 mr-2 mt-0.5 shrink-0" />
-                    Beside ZPHS, Siripuram, Dist: Sangaredddy. PIN:502314
+                    Beside ZPHS, Siripuram, Dist: Sangareddy. PIN:502314
                   </a>
                 </p>
                 <p>
                   <a href="mailto:contact@saisaienbroidery.com" className="hover:text-white flex items-center">
                     <Mail className="h-5 w-5 mr-2" />
-                    contact@saisaienbroidery.com
+                    contact@saisaiembroidery.com
                   </a>
                 </p>
                 <p>

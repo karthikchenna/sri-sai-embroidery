@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface Design {
   id: number;
@@ -24,6 +25,14 @@ const DesignDetail = () => {
   const { id } = useParams();
   const [design, setDesign] = useState<Design | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const handleAddToCart = () => {
+    toast.info("This feature will be available soon...", {
+      duration: 3000,
+    });
+  };
+
+  
 
   useEffect(() => {
     const fetchDesign = async () => {
@@ -94,7 +103,7 @@ const DesignDetail = () => {
       <Header />
       
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+        <h1 className="text-4xl font-bold text-center mb-4 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
           Design {design.design_no}
         </h1>
         {design.description && (
@@ -163,7 +172,10 @@ const DesignDetail = () => {
                 </div>
               </div>
 
-              <Button className="w-full mt-6 bg-purple-600 hover:bg-purple-700 text-lg py-3">
+              <Button 
+                className="w-full mt-6 bg-purple-600 hover:bg-purple-700 text-lg py-3"
+                onClick={handleAddToCart}
+              >
                 Add to Cart
               </Button>
             </div>

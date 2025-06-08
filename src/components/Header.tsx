@@ -1,17 +1,26 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { User, ShoppingCart, Menu, X } from 'lucide-react';
+import { User, ShoppingCart, Menu, X, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   const navItems = [
     { name: 'Home', path: '/', sectionId: 'home' },
     { name: 'Designs', path: '/designs' },
-    { name: 'About Us', path: '/about', sectionId: 'about' },
+    { name: 'About', path: '/about', sectionId: 'about' },
     { name: 'Contact', path: '/contact', sectionId: 'contact' },
   ];
 
@@ -35,6 +44,17 @@ const Header = () => {
     // If !sectionId and location.pathname === path, it's a link to the current page without a specific section, do nothing (or navigate to top if desired)
 
     setIsMobileMenuOpen(false);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Scroll to top before navigation
+      window.scrollTo(0, 0);
+      navigate(`/designs?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+      setIsSearchOpen(false);
+    }
   };
 
   return (
@@ -73,15 +93,31 @@ const Header = () => {
 
           {/* Right Icons */}
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm" className="hidden md:flex">
-              <User className="h-5 w-5" />
-            </Button>
-            {/* <Button variant="ghost" size="sm" className="relative">
-              <ShoppingCart className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                0
-              </span>
-            </Button> */}
+            {/* Mobile Search Icon */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsSearchOpen(true)}
+                className="h-9 w-9 p-0"
+              >
+                <Search className="h-5 w-5 text-gray-600" />
+              </Button>
+            </div>
+
+            {/* Desktop Search */}
+            <div className="hidden md:flex items-center">
+              <form onSubmit={handleSearch} className="relative group">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-purple-600 transition-colors duration-200" />
+                <Input
+                  type="search"
+                  placeholder="Search Designs..."
+                  className="w-[200px] h-9 pl-9 pr-4 rounded-full border-gray-200 focus:border-purple-600 focus:ring-0 focus:outline-none transition-all duration-200 bg-gray-50/50 hover:bg-gray-50 focus:bg-white"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </form>
+            </div>
 
             {/* Mobile Menu Button */}
             <Button
@@ -90,7 +126,7 @@ const Header = () => {
               className="md:hidden"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
-              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {isMobileMenuOpen ? <X className="h-15 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
         </div>
@@ -127,6 +163,26 @@ const Header = () => {
             ))}
           </nav>
         </div>
+
+        {/* Search Dialog */}
+        <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Search Designs</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSearch} className="relative group mt-4">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-purple-600 transition-colors duration-200" />
+              <Input
+                type="search"
+                placeholder="Search Designs..."
+                className="w-full h-9 pl-9 pr-4 rounded-full border-gray-200 focus:border-purple-600 focus:ring-0 focus:outline-none transition-all duration-200 bg-gray-50/50 hover:bg-gray-50 focus:bg-white"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                autoFocus
+              />
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </header>
   );
