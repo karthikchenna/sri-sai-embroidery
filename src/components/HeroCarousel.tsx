@@ -10,19 +10,19 @@ const HeroCarousel = () => {
   const slides = [
     {
       // image: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2874&q=80',
-      image: 'Assets/carsouel-3.png',
+      image: 'Assets/carsouel-1.png',
       title: 'Handcrafted Elegance',
       subtitle: 'Discover our premium embroidery collections'
     },
     {
       // image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2800&q=80',
-      image: 'Assets/carsouel-6.jpg',
+      image: 'Assets/carsouel-2.jpg',
       title: 'Traditional Artistry',
       subtitle: 'Experience timeless beauty in every stitch'
     },
     {
       // image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2800&q=80',
-      image: 'Assets/carsouel-5.png',
+      image: 'Assets/carsouel-3.jpg',
       title: 'Contemporary Designs',
       subtitle: 'Modern embroidery for today\'s fashion'
     }

@@ -6,6 +6,22 @@ import AdminLoginModal from './AdminLoginModal';
 
 const Footer = () => {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleQuickLinkClick = (path: string) => {
+    if (path === '/' && location.pathname === '/') {
+      // If already on home page, smooth scroll to top
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    } else {
+      // For other pages, navigate and scroll to top
+      window.scrollTo(0, 0);
+      navigate(path);
+    }
+  };
 
   return (
     <>
@@ -48,10 +64,38 @@ const Footer = () => {
             <div>
               <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2">
-                <li><Link to="/" className="text-gray-300 hover:text-white">Home</Link></li>
-                <li><Link to="/designs" className="text-gray-300 hover:text-white">Designs</Link></li>
-                <li><Link to="/about" className="text-gray-300 hover:text-white">About Us</Link></li>
-                <li><Link to="/contact" className="text-gray-300 hover:text-white">Contact</Link></li>
+                <li>
+                  <button 
+                    onClick={() => handleQuickLinkClick('/')}
+                    className="text-gray-300 hover:text-white"
+                  >
+                    Home
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleQuickLinkClick('/designs')}
+                    className="text-gray-300 hover:text-white"
+                  >
+                    Designs
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleQuickLinkClick('/about')}
+                    className="text-gray-300 hover:text-white"
+                  >
+                    About Us
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleQuickLinkClick('/contact')}
+                    className="text-gray-300 hover:text-white"
+                  >
+                    Contact
+                  </button>
+                </li>
               </ul>
             </div>
 

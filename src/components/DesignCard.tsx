@@ -48,10 +48,10 @@ const DesignCard = ({ design }: DesignCardProps) => {
         </div>
         
         <div className="p-4">
-          <h3 className="text-lg font-semibold text-gray-800 mb-1">Design No: {design.design_no}</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-0">Design No: {design.design_no}</h3>
           {design.description && <p className="text-md text-gray-600 mb-0">{design.description}</p>}
           <p className="text-md text-gray-600 mb-0">Stitches: {design.stitches.toLocaleString()}</p>
-          <div className="flex justify-between items-center mb-1">
+          <div className="flex justify-between items-center mb-0">
             <p className="text-md text-gray-600">Category: {design.category.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</p>
             <Button 
               className="bg-purple-600 hover:bg-purple-700 text-white px-6 pointer-events-none"

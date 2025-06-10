@@ -10,13 +10,13 @@ const ShopByCollections = () => {
       id: 'budget-friendly',
       name: 'Budget Friendly',
       description: 'Affordable designs for every occasion',
-      image: 'Assets/Photo Embrodiery.jpg'
+      image: 'Assets/Budget Friendlyy.png'      
     },
     {
       id: 'exclusive',
       name: 'Exclusive',
       description: 'Premium and unique designs',
-      image: 'Assets/All over.jpg'
+      image: 'Assets/Exclusive.jpg'
     },
     {
       id: 'mirror-work',
@@ -34,7 +34,7 @@ const ShopByCollections = () => {
       id: 'hand-all-over',
       name: 'Hand All Over',
       description: 'Intricate hand embroidery designs',
-      image: 'Assets/All over.jpg'
+      image: 'Assets/Hand All Over.jpeg'
     },
     {
       id: 'kutch-work',
@@ -46,7 +46,7 @@ const ShopByCollections = () => {
       id: 'bridal',
       name: 'Bridal',
       description: 'Luxurious designs for special occasions',
-      image: 'Assets/Mirror Work.jpg'
+      image: 'Assets/Bridal.jpg'
     },
     {
       id: 'embroidery-frames',
