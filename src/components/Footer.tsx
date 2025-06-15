@@ -121,9 +121,9 @@ const Footer = () => {
                   </a>
                 </p>
                 <p>
-                  <a href="mailto:contact@saisaienbroidery.com" className="hover:text-white flex items-center">
+                  <a href="mailto:contact.srisaiembroidery@gmail.com" className="hover:text-white flex items-center">
                     <Mail className="h-5 w-5 mr-2" />
-                    contact@saisaiembroidery.com
+                    contact.srisaiembroidery@gmail.com
                   </a>
                 </p>
                 <p>

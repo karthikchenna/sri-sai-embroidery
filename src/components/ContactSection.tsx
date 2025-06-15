@@ -96,8 +96,8 @@ const ContactSection = () => {
                 <div>
                   <h4 className="font-semibold text-gray-800">Email</h4>
                   <p className="text-gray-600 hover:text-purple-600">
-                    <a href="mailto:contact@saisaienbroidery.com">
-                      contact@saisaiembroidery.com
+                    <a href="mailto:contact.srisaiembroidery@gmail.com">
+                      contact.srisaiembroidery@gmail.com
                     </a>
                   </p>
                 </div>
