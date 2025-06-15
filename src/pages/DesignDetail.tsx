@@ -35,6 +35,7 @@ const DesignDetail = () => {
   
 
   useEffect(() => {
+    window.scrollTo(0, 0); // Scroll to top on component mount
     const fetchDesign = async () => {
       if (!id) return;
 
@@ -48,10 +49,11 @@ const DesignDetail = () => {
 
         if (error) {
           console.error('Error fetching design:', error);
+          setDesign(null);
           return;
         }
 
-        setDesign(data);
+        setDesign(data as Design);
       } catch (error) {
         console.error('Error fetching design:', error);
       } finally {
@@ -189,6 +191,11 @@ const DesignDetail = () => {
                 <li>• Durable, colorfast threads used</li>
                 <li>• Suitable for all fabric types</li>
                 <li>• Intricate detailing with precision</li>
+              </ul>
+              <h3 className="text-xl font-bold text-gray-800 mt-5 mb-3">Want to place an order?</h3>
+              <ul className="text-gray-600 space-y-2">
+                <li>• Take a screenshot of your favorite design</li>
+                <li>• Send it to us on WhatsApp</li>              
               </ul>
             </div>
           </div>

@@ -32,7 +32,7 @@ const Footer = () => {
             <div>
               <div className="flex flex-col items-start mb-1">
                 <img 
-                  src="Assets/Logo.png" 
+                  src="/Assets/Logo.png" 
                   alt="Sri Sai Embroidery Logo" 
                   className="h-20 w-20 object-contain mb-2"
                 />

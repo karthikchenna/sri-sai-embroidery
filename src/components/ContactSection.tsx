@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { MapPin, Mail, Phone, Instagram } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const ContactSection = () => {
   const [formData, setFormData] = useState({
@@ -14,13 +15,48 @@ const ContactSection = () => {
   });
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Message Sent!",
-      description: "We'll get back to you soon.",
-    });
-    setFormData({ name: '', email: '', phone: '', message: '' });
+
+    if (!/^[0-9]+$/.test(formData.phone)) {
+      toast({
+        title: "Validation Error",
+        description: "Phone number must contain only digits.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.email.endsWith("@gmail.com")) {
+      toast({
+        title: "Validation Error",
+        description: "Email must end with @gmail.com.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase.from('contacts').insert([formData]);
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Message Sent!",
+        description: "We'll get back to you soon.",
+        className: "bg-green-50 border-green-200",
+      });
+      setFormData({ name: '', email: '', phone: '', message: '' });
+    } catch (error) {
+      toast({
+        title: "Failed to Send Message",
+        description: "There was an error sending your message. Please try again.",
+        variant: "destructive",
+      });
+      console.error('Error sending message:', error);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
