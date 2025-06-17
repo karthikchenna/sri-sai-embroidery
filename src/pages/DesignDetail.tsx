@@ -105,8 +105,8 @@ const DesignDetail = () => {
       <Header />
       
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-center mb-4 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
-          Design {design.design_no}
+        <h1 className="text-4xl font-bold text-center py-1 mb-4 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+          Design {design.design_no} <br/>          
         </h1>
         {design.description && (
           <p className="text-center text-xl text-gray-700 mb-8">{design.description}</p>

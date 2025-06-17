@@ -8,7 +8,7 @@ const WhatsAppBanner = () => {
 
   return (
     <div className="bg-green-600 text-white text-center py-2 flex items-center justify-center space-x-2">
-      <p className="text-sm font-medium">For orders contact us through WhatsApp:</p>
+      <p className="text-sm font-medium">For orders contact us through WhatsApp</p>
       <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-1 hover:underline">
         <BsWhatsapp className="h-4 w-4" />
       </a>

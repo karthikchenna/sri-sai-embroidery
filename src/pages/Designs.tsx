@@ -56,6 +56,11 @@ const Designs = () => {
       }
 
       setDesigns(data || []);
+      // Scroll to top after designs are loaded
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     } catch (error) {
       console.error('Error fetching designs:', error);
     } finally {
@@ -64,6 +69,11 @@ const Designs = () => {
   };
 
   useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
     const category = searchParams.get('category');
     if (category) {
       setActiveCategory(category);
@@ -73,6 +83,34 @@ const Designs = () => {
   useEffect(() => {
     fetchDesigns();
   }, [activeCategory, searchQuery]);
+
+  // Enable browser's scroll restoration
+  useEffect(() => {
+    // Save the current scroll restoration behavior
+    const originalScrollRestoration = window.history.scrollRestoration;
+    
+    // Enable automatic scroll restoration
+    window.history.scrollRestoration = 'auto';
+    
+    // Cleanup: restore original behavior when component unmounts
+    return () => {
+      window.history.scrollRestoration = originalScrollRestoration;
+    };
+  }, []);
+
+  // Restore scroll position when designs are loaded
+  useEffect(() => {
+    if (!loading) {
+      const savedPosition = sessionStorage.getItem('designsScrollPosition');
+      if (savedPosition) {
+        // Use a small delay to ensure the page has rendered
+        setTimeout(() => {
+          window.scrollTo(0, parseInt(savedPosition));
+          sessionStorage.removeItem('designsScrollPosition');
+        }, 100);
+      }
+    }
+  }, [loading]);
 
   if (loading) {
     return (
@@ -93,7 +131,7 @@ const Designs = () => {
       <Header />
       
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-center mb-8 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+        <h1 className="text-4xl py-1 font-bold text-center mb-8 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
           {searchQuery ? `Search Results for "${searchQuery}"` : 'Our Embroidery Designs'}
         </h1>
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { User, ShoppingCart, Menu, X, Instagram, Phone, Mail, MapPin, Lock } from 'lucide-react';
+import { User, ShoppingCart, Menu, X, Instagram, Phone, Mail, MapPin, Lock, Headset } from 'lucide-react';
 import { BsWhatsapp } from 'react-icons/bs';
 import AdminLoginModal from './AdminLoginModal';
 
@@ -107,6 +107,15 @@ const Footer = () => {
                 <li><span className="text-gray-300">Return Policy</span></li>
                 <li><span className="text-gray-300">Terms of Service</span></li>
                 <li><span className="text-gray-300">Privacy Policy</span></li>
+                <li>
+                  <button 
+                    onClick={() => handleQuickLinkClick('/help')}
+                    className="text-gray-300 hover:text-white flex items-center gap-2"
+                  >
+                    <Headset className="h-5 w-5" />
+                    Help Center
+                  </button>
+                </li>
               </ul>
             </div>
 
@@ -150,13 +159,14 @@ const Footer = () => {
 
           <div className="border-t border-gray-700 mt-8 pt-8 text-center">
             <p className="text-gray-300">
-              © 2025 Sri Sai Embroidery. All rights reserved. | <a href="https://karthikchenna.github.io/Portfolio/" className="font-bold hover:underline bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent" target="_blank" rel="noopener noreferrer">Created by Karthik</a>
+              © 2025 Sri Sai Embroidery. All rights reserved. | <a href="https://karthikchenna.github.io/Portfolio/" className="font-bold  bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent" target="_blank" rel="noopener noreferrer">Created by Karthik</a>
+              {/* {new Date().getFullYear()}  */}
             </p>
             <button
               onClick={() => setShowAdminLogin(true)}
-              className="mt-2 text-white  hover:underline  flex items-center justify-center space-x-1 block mx-auto"
+              className="mt-2 text-sm text-white  hover:underline  flex items-center justify-center space-x-1 block mx-auto"
             >
-              <Lock className="h-4 w-4" />
+              <Lock className="h-3 w-3" />
               <span>Admin Login</span>
             </button>
           </div>

@@ -21,6 +21,8 @@ const DesignCard = ({ design }: DesignCardProps) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
+    // Store the current scroll position using sessionStorage
+    sessionStorage.setItem('designsScrollPosition', window.pageYOffset.toString());
     navigate(`/design/${design.id}`);
   };
 

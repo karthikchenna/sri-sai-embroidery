@@ -342,14 +342,14 @@ const AdminDashboard = () => {
         </Button>
       </div>
 
-      <div className="mb-8 flex space-x-4">
-        <Button onClick={handleShowUploadDesign} className="bg-green-600 hover:bg-green-700">
+      <div className="mb-8 flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0">
+        <Button onClick={handleShowUploadDesign} className="bg-green-600 hover:bg-green-700 w-full sm:w-auto">
           <Upload className="mr-2 h-4 w-4" /> Upload Design
         </Button>
-        <Button onClick={handleShowMessages} className="bg-purple-600 hover:bg-purple-700">
+        <Button onClick={handleShowMessages} className="bg-purple-600 hover:bg-purple-700 w-full sm:w-auto">
           Messages
         </Button>
-        <Button onClick={handleShowStats} className="bg-blue-600 hover:bg-blue-700">
+        <Button onClick={handleShowStats} className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
           <BarChart2 className="mr-2 h-4 w-4" /> Statistics
         </Button>
       </div>
