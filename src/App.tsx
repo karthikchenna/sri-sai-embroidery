@@ -13,6 +13,9 @@ import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
 import HelpCenter from "./pages/HelpCenter";
+import { UserProvider } from '@/hooks/useUser';
+import Profile from "./pages/Profile";
+import UserAddressForm from "./pages/UserAddressForm";
 
 const queryClient = new QueryClient();
 
@@ -22,9 +25,11 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
+        <UserProvider>
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </UserProvider>
         <Analytics />
       </TooltipProvider>
     </QueryClientProvider>
@@ -45,6 +50,8 @@ const AppRoutes = () => {
         <Route path="/design/:id" element={<DesignDetail />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/help" element={<HelpCenter />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/user_address_form" element={<UserAddressForm />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {!isAdminPage && <FloatingWhatsApp />}

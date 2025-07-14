@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { User, ShoppingCart, Menu, X, Search } from 'lucide-react';
+import { User, ShoppingCart, Menu, X, Search, LogOut, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -11,6 +11,9 @@ import {
 } from "@/components/ui/dialog";
 import WhatsAppBanner from './WhatsAppBanner';
 import { supabase } from '@/integrations/supabase/client';
+import AuthModal from './AuthModal';
+import { useUser } from '@/hooks/useUser';
+import { toast } from '@/components/ui/sonner';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -18,8 +21,27 @@ const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, logout } = useUser();
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowUserDropdown(false);
+      }
+    }
+    if (showUserDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+    return undefined;
+  }, [showUserDropdown]);
 
   const navItems = [
     { name: 'Home', path: '/', sectionId: 'home' },
@@ -169,6 +191,85 @@ const Header = () => {
                 </form>
               </div>
 
+              {/* User Login Dropdown */}
+              <div className="relative" ref={dropdownRef}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-9 w-9 p-0"
+                  onClick={() => setShowUserDropdown((prev) => !prev)}
+                  aria-label="User Menu"
+                >
+                  <User className="h-6 w-6 text-gray-600" />
+                </Button>
+                {showUserDropdown && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                    {user ? (
+                      <div className="p-4 flex flex-col items-start">
+                        <div className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                          <User className="h-4 w-4" />
+                          {user.user_metadata?.name || user.email}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          className="w-full text-left flex items-center gap-2"
+                          onClick={() => {
+                            setShowUserDropdown(false);
+                            navigate('/profile');
+                          }}
+                        >
+                          <User className="h-4 w-4" /> Profile
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          className="w-full text-left flex items-center gap-2"
+                          onClick={() => {
+                            setShowUserDropdown(false);
+                            navigate('/cart');
+                          }}
+                        >
+                          <ShoppingCart className="h-4 w-4" /> Cart
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          className="w-full text-left flex items-center gap-2"
+                          onClick={() => {
+                            setShowUserDropdown(false);
+                            navigate('/orders');
+                          }}
+                        >
+                          <List className="h-4 w-4" /> My Orders
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          className="w-full text-left flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white"
+                          onClick={async () => {
+                            await logout();
+                            setShowUserDropdown(false);
+                            toast.success('Logout successful');
+                          }}
+                        >
+                          <LogOut className="h-4 w-4" /> Logout
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="p-4">
+                        <Button
+                          variant="default"
+                          className="w-full"
+                          onClick={() => {
+                            setShowUserDropdown(false);
+                            setShowAuthModal(true);
+                          }}
+                        >
+                          Login
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
               {/* Mobile Menu Button */}
               <Button
                 variant="ghost"
@@ -263,6 +364,9 @@ const Header = () => {
               </form>
             </DialogContent>
           </Dialog>
+
+          {/* User Login Modal */}
+          {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
         </div>
       </header>
     </>
