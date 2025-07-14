@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useUser } from '@/hooks/useUser';
 
 interface Design {
   id: number;
@@ -25,11 +26,51 @@ const DesignDetail = () => {
   const { id } = useParams();
   const [design, setDesign] = useState<Design | null>(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useUser();
+  const [adding, setAdding] = useState(false);
 
-  const handleAddToCart = () => {
-    toast.info("This feature will be available soon...", {
-      duration: 3000,
-    });
+  const handleAddToCart = async () => {
+    if (!user) {
+      toast.error('Please log in to add to cart.');
+      return;
+    }
+    if (!design) return;
+    setAdding(true);
+    // Check if already in cart
+    const { data: existing, error: fetchError } = await (supabase as any)
+      .from('cart')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('design_id', design.id)
+      .single();
+    if (!fetchError && existing) {
+      // Update quantity if already in cart
+      const { error: updateError } = await (supabase as any)
+        .from('cart')
+        .update({ quantity: existing.quantity + 1 })
+        .eq('id', existing.id);
+      if (!updateError) {
+        toast.success('Design added to cart');
+      } else {
+        toast.error('Failed to update cart');
+      }
+    } else {
+      // Insert new cart item
+      const { error: insertError } = await (supabase as any)
+        .from('cart')
+        .insert({
+          user_id: user.id,
+          design_id: design.id,
+          quantity: 1,
+        });
+      if (!insertError) {
+        toast.success('Design added to cart');
+      } else {
+        console.error('Add to cart error:', insertError);
+        toast.error(`Failed to add to cart: ${insertError.message || insertError.details || 'Unknown error'}`);
+      }
+    }
+    setAdding(false);
   };
 
   
@@ -53,7 +94,7 @@ const DesignDetail = () => {
           return;
         }
 
-        setDesign(data as Design);
+        setDesign(data as unknown as Design);
       } catch (error) {
         console.error('Error fetching design:', error);
       } finally {
@@ -177,8 +218,9 @@ const DesignDetail = () => {
               <Button 
                 className="w-full mt-6 bg-purple-600 hover:bg-purple-700 text-lg py-3"
                 onClick={handleAddToCart}
+                disabled={adding}
               >
-                Add to Cart
+                {adding ? 'Adding...' : 'Add to Cart'}
               </Button>
             </div>
 

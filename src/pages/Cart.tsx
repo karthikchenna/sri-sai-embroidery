@@ -18,6 +18,9 @@ const Cart: React.FC = () => {
   const shipping = 0;
   const total = subtotal + shipping;
 
+  // Total quantity of all designs in cart
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
   const handleQuantityChange = async (id: string, newQuantity: number) => {
     if (newQuantity < 1) return;
     try {
@@ -85,7 +88,7 @@ const Cart: React.FC = () => {
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-3xl font-bold text-purple-700">Shopping Cart</h2>
               <div className="text-lg font-medium text-gray-700">
-                {cartItemCount} item{cartItemCount > 1 ? 's' : ''} in your cart
+                {totalItems} item{totalItems > 1 ? 's' : ''} in your cart
               </div>
             </div>
             
@@ -192,7 +195,7 @@ const Cart: React.FC = () => {
                 <h3 className="text-xl font-bold mb-4 text-gray-800">Order Summary</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Items ({cartItemCount})</span>
+                    <span className="text-gray-600">Items ({totalItems})</span>
                     <span className="font-medium">₹{subtotal.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">

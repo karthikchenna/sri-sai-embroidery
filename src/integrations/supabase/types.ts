@@ -80,7 +80,31 @@ export type Database = {
           created_at?: string
         }
         Relationships: []
-      }
+      },
+      cart: {
+        Row: {
+          id: string;
+          user_id: string;
+          design_id: number;
+          quantity: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          design_id: number;
+          quantity: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          design_id?: number;
+          quantity?: number;
+          created_at?: string;
+        };
+        Relationships: [];
+      },
     }
     Views: {
       [_ in never]: never
