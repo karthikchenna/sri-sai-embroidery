@@ -1,19 +1,13 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { User, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-interface AdminLoginModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-const AdminLoginModal = ({ isOpen, onClose }: AdminLoginModalProps) => {
+const AdminLoginPage = () => {
   const [credentials, setCredentials] = useState({
     username: '',
     password: ''
@@ -30,8 +24,7 @@ const AdminLoginModal = ({ isOpen, onClose }: AdminLoginModalProps) => {
         title: "Login Successful!",
         description: "Welcome to the admin dashboard.",
       });
-      onClose();
-      navigate('/admin');
+      navigate('/admin-dashboard');
     } else {
       toast({
         title: "Login Failed",
@@ -49,17 +42,10 @@ const AdminLoginModal = ({ isOpen, onClose }: AdminLoginModalProps) => {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-center text-2xl font-bold text-purple-600">
-            Admin Login
-          </DialogTitle>
-          <p className="text-center text-gray-600">
-            Enter your credentials to access the admin dashboard
-          </p>
-        </DialogHeader>
-
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4">
+      <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
+        <h2 className="text-center text-2xl font-bold text-purple-600 mb-2">Admin Login</h2>
+        <p className="text-center text-gray-600 mb-6">Enter your credentials to access the admin dashboard</p>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="username">Username</Label>
@@ -105,16 +91,16 @@ const AdminLoginModal = ({ isOpen, onClose }: AdminLoginModalProps) => {
           <div className="text-center">
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => navigate('/')}
               className="text-gray-500 hover:text-gray-700 underline"
             >
               Back to home
             </button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 };
 
-export default AdminLoginModal;
+export default AdminLoginPage;

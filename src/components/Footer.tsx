@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, ShoppingCart, Menu, X, Instagram, Phone, Mail, MapPin, Lock, Headset } from 'lucide-react';
 import { BsWhatsapp } from 'react-icons/bs';
-import AdminLoginModal from './AdminLoginModal';
 
 const Footer = () => {
-  const [showAdminLogin, setShowAdminLogin] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -103,10 +101,38 @@ const Footer = () => {
             <div>
               <h4 className="text-lg font-semibold mb-4">Customer Service</h4>
               <ul className="space-y-2">
-                <li><span className="text-gray-300">Shipping Policy</span></li>
-                <li><span className="text-gray-300">Return Policy</span></li>
-                <li><span className="text-gray-300">Terms of Service</span></li>
-                <li><span className="text-gray-300">Privacy Policy</span></li>
+                <li>
+                  <button 
+                    onClick={() => handleQuickLinkClick('/shipping-policy')}
+                    className="text-gray-300 hover:text-white"
+                  >
+                    Shipping Policy
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleQuickLinkClick('/return-policy')}
+                    className="text-gray-300 hover:text-white"
+                  >
+                    Return Policy
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleQuickLinkClick('/terms&conditions')}
+                    className="text-gray-300 hover:text-white"
+                  >
+                    Terms of Service
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleQuickLinkClick('/privacy-policy')}
+                    className="text-gray-300 hover:text-white"
+                  >
+                    Privacy Policy
+                  </button>
+                </li>
                 <li>
                   <button 
                     onClick={() => handleQuickLinkClick('/help')}
@@ -163,7 +189,7 @@ const Footer = () => {
               {/* {new Date().getFullYear()}  */}
             </p>
             <button
-              onClick={() => setShowAdminLogin(true)}
+              onClick={() => navigate('/admin-login')}
               className="mt-2 text-sm text-white  hover:underline  flex items-center justify-center space-x-1 block mx-auto"
             >
               <Lock className="h-3 w-3" />
@@ -173,10 +199,6 @@ const Footer = () => {
         </div>
       </footer>
 
-      <AdminLoginModal 
-        isOpen={showAdminLogin} 
-        onClose={() => setShowAdminLogin(false)} 
-      />
     </>
   );
 };

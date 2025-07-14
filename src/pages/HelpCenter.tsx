@@ -2,7 +2,7 @@ import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, Filter, MessageCircle, ShoppingCart, ArrowRight } from 'lucide-react';
+import { Search, Filter, MessageCircle, ShoppingCart, ArrowRight, LogIn, Home, CreditCard } from 'lucide-react';
 
 const HelpCenter = () => {
   const helpSections = [
@@ -37,7 +37,7 @@ const HelpCenter = () => {
       ]
     },
     {
-      title: "How to Order",
+      title: "How to Order via Whatsapp",
       icon: <ShoppingCart className="h-6 w-6 text-purple-600" />,
       content: [
         "Browse and select your favorite designs",
@@ -45,6 +45,39 @@ const HelpCenter = () => {
         "Send the screenshot to us via WhatsApp",
         "We'll get back to you with pricing and details",
         "Confirm your order and provide delivery details"
+      ]
+    },
+    {
+      title: "How to Login",
+      icon: <LogIn className="h-6 w-6 text-purple-600" />,
+      content: [
+        "Click the user icon in the top right of the header.",
+        "In the dropdown, click 'Login'.",
+        "A login/signup modal will appear.",
+        "Enter your email/mobile and password to login, or sign up if you don't have an account.",
+        "After login, you can access your profile, cart, and orders."
+      ]
+    },
+    {
+      title: "How to Add Address",
+      icon: <Home className="h-6 w-6 text-purple-600" />,
+      content: [
+        "Login to your account.",
+        "Click the user icon and select 'Profile'.",
+        "In your profile, go to the 'Your Addresses' section.",
+        "Click the 'Add Address' button.",
+        "Fill in your address details and save. You can also edit or delete addresses from your profile."
+      ]
+    },
+    {
+      title: "How to Order through Website",
+      icon: <CreditCard className="h-6 w-6 text-purple-600" />,
+      content: [
+        "Browse designs and click on any design to view details.",
+        "Click 'Add to Cart' to add the design to your cart (login required).",
+        "Go to your cart to review your selected items.",
+        "Proceed to checkout and follow the instructions to place your order.",
+        "You can view your orders in the 'My Orders' section after logging in."
       ]
     }
   ];

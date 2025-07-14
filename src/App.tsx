@@ -19,6 +19,11 @@ import Profile from "./pages/Profile";
 import UserAddressForm from "./pages/UserAddressForm";
 import EditUserAddressForm from "./pages/EditUserAddressForm";
 import Cart from "./pages/Cart";
+import AdminLoginPage from "./components/AdminLoginModal";
+import ShippingPolicy from "./pages/ShippingPolicy";
+import ReturnPolicy from "./pages/ReturnPolicy";
+import TermsAndConditions from "./pages/TermsAndConditions";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
 
@@ -53,12 +58,17 @@ const AppRoutes = () => {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/design/:id" element={<DesignDetail />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/admin-login" element={<AdminLoginPage />} />
         <Route path="/help" element={<HelpCenter />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/user_address_form" element={<UserAddressForm />} />
         <Route path="/edit_address/:id" element={<EditUserAddressForm />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/shipping-policy" element={<ShippingPolicy />} />
+        <Route path="/return-policy" element={<ReturnPolicy />} />
+        <Route path="/terms&conditions" element={<TermsAndConditions />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {!isAdminPage && <FloatingWhatsApp />}
