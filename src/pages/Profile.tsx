@@ -5,7 +5,8 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
-import { User as UserIcon, Mail, Phone, BadgeInfo, Home, MapPin, Landmark, Smartphone, Plus } from 'lucide-react';
+import { User as UserIcon, Mail, Phone, BadgeInfo, Home, MapPin, Landmark, Smartphone, Plus, Pencil, Trash2 } from 'lucide-react';
+import { toast } from '@/components/ui/sonner';
 
 interface Address {
   id: string;
@@ -123,7 +124,36 @@ const Profile: React.FC = () => {
               ) : addresses && addresses.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {addresses.map(addr => (
-                    <div key={addr.id} className="bg-gray-50 rounded-xl p-5 border border-gray-200 shadow hover:shadow-lg transition-shadow">
+                    <div key={addr.id} className="bg-gray-50 rounded-xl p-5 border border-gray-200 shadow hover:shadow-lg transition-shadow relative">
+                      <button
+                        className="absolute top-3 right-3 p-1 rounded hover:bg-purple-100"
+                        title="Edit Address"
+                        onClick={() => navigate(`/edit_address/${addr.id}`)}
+                      >
+                        <Pencil className="h-4 w-4 text-purple-500" />
+                      </button>
+                      <button
+                        className="absolute top-3 right-10 p-1 rounded hover:bg-red-100"
+                        title="Delete Address"
+                        onClick={async () => {
+                          if (window.confirm('Are you sure you want to delete this address?')) {
+                            const { error } = await (supabase as any)
+                              .from('user_addresses')
+                              .delete()
+                              .eq('id', addr.id)
+                              .eq('user_id', user.id);
+                            if (!error) {
+                              toast.success('Address deleted');
+                              // Refresh addresses
+                              setAddresses(addresses.filter(a => a.id !== addr.id));
+                            } else {
+                              toast.error('Failed to delete address');
+                            }
+                          }
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </button>
                       <div className="flex items-center gap-2 mb-1">
                         <UserIcon className="h-4 w-4 text-purple-400" />
                         <span className="font-semibold text-gray-700">{addr.name}</span>

@@ -14,8 +14,11 @@ import NotFound from "./pages/NotFound";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
 import HelpCenter from "./pages/HelpCenter";
 import { UserProvider } from '@/hooks/useUser';
+import { CartProvider } from '@/hooks/useCart';
 import Profile from "./pages/Profile";
 import UserAddressForm from "./pages/UserAddressForm";
+import EditUserAddressForm from "./pages/EditUserAddressForm";
+import Cart from "./pages/Cart";
 
 const queryClient = new QueryClient();
 
@@ -26,9 +29,11 @@ const App = () => {
         <Toaster />
         <Sonner />
         <UserProvider>
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
+          <CartProvider>
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
+          </CartProvider>
         </UserProvider>
         <Analytics />
       </TooltipProvider>
@@ -52,6 +57,8 @@ const AppRoutes = () => {
         <Route path="/help" element={<HelpCenter />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/user_address_form" element={<UserAddressForm />} />
+        <Route path="/edit_address/:id" element={<EditUserAddressForm />} />
+        <Route path="/cart" element={<Cart />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {!isAdminPage && <FloatingWhatsApp />}
