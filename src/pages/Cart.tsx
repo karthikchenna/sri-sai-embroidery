@@ -71,6 +71,7 @@ const Cart: React.FC = () => {
           <ShoppingBag className="h-16 w-16 text-gray-400 mb-4" />
           <h2 className="text-2xl font-bold mb-4">Your Cart is Empty</h2>
           <p className="text-gray-600 mb-6">Start shopping to add designs to your cart.</p>
+          <p className="text-gray-600 mb-6">Please refresh the page if you don't see recent added items.</p>
           <Button onClick={() => navigate('/designs')} className="bg-purple-600 hover:bg-purple-700">
             Browse Designs
           </Button>
@@ -78,6 +79,33 @@ const Cart: React.FC = () => {
       </>
     );
   }
+
+  // Razorpay demo checkout handler
+  const handleCheckout = () => {
+    const options = {
+      key: "rzp_test_n3YPzOoCrq26tE", // Provided Razorpay Test Key ID
+      amount: 50000, // Amount in paise (₹500.00)
+      currency: "INR",
+      name: "Sri Sai Embroidery",
+      description: "Test Transaction",
+      image: "/public/Assets/Logo.png", // Optional: your logo
+      handler: function (response: any) {
+        alert("Payment successful! Payment ID: " + response.razorpay_payment_id);
+        // You can also send this response to your backend for verification
+      },
+      prefill: {
+        name: "Test User",
+        email: "test@example.com",
+        contact: "9999999999"
+      },
+      theme: {
+        color: "#8b5cf6"
+      }
+    };
+
+    const rzp = new (window as any).Razorpay(options);
+    rzp.open();
+  };
 
   return (
     <>
@@ -211,10 +239,7 @@ const Cart: React.FC = () => {
                 </div>
                 <Button 
                   className="w-full mt-6 bg-purple-600 hover:bg-purple-700 text-lg py-3" 
-                  onClick={() => {
-                    // TODO: Implement checkout functionality
-                    alert('Checkout functionality coming soon!');
-                  }}
+                  onClick={() => navigate('/checkout')}
                 >
                   Proceed to Checkout
                 </Button>

@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LogOut, Upload, BarChart2, ArrowLeft, X, MessageSquare, Edit, Clock, CheckCircle2, Home as HomeIcon, Menu, ShoppingCart } from 'lucide-react';
+import { LogOut, Upload, BarChart2, ArrowLeft, X, MessageSquare, Edit, Clock, CheckCircle2, Home as HomeIcon, Menu, ShoppingCart, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableFooter } from '@/components/ui/table';
@@ -31,7 +31,7 @@ interface ContactMessage {
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [activeAction, setActiveAction] = useState<'home' | 'upload' | 'messages' | 'stats' | 'edit' | 'pending' | 'successful'>('home');
+  const [activeAction, setActiveAction] = useState<'home' | 'upload' | 'messages' | 'stats' | 'edit' | 'pending' | 'successful' | 'new'>('home');
   const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);
   const [categoryStats, setCategoryStats] = useState<CategoryStats[]>([]);
   const [totalDesigns, setTotalDesigns] = useState(0);
@@ -69,6 +69,29 @@ const AdminDashboard = () => {
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [userCount, setUserCount] = useState<number | null>(null);
+  const [totalOrdersCount, setTotalOrdersCount] = useState<number | null>(null);
+  const [todayOrders, setTodayOrders] = useState<any[]>([]);
+  const [loadingTodayOrders, setLoadingTodayOrders] = useState(false);
+  const [todayOrderImages, setTodayOrderImages] = useState<{ [orderId: string]: string | null }>({});
+  const [todayOrdersCount, setTodayOrdersCount] = useState<number | null>(null);
+  const [recentOrderImages, setRecentOrderImages] = useState<{ [orderId: string]: string | null }>({});
+  const [totalEarnings, setTotalEarnings] = useState<number | null>(null);
+
+  // Add state for pending orders
+  const [pendingOrders, setPendingOrders] = useState<any[]>([]);
+  const [loadingPendingOrders, setLoadingPendingOrders] = useState(false);
+  const [pendingOrderImages, setPendingOrderImages] = useState<{ [orderId: string]: string | null }>({});
+  const [confirmDialog, setConfirmDialog] = useState<{ open: boolean; orderId: string | null }>({ open: false, orderId: null });
+
+  // Add state for successful orders
+  const [successfulOrders, setSuccessfulOrders] = useState<any[]>([]);
+  const [loadingSuccessfulOrders, setLoadingSuccessfulOrders] = useState(false);
+  const [successfulOrderImages, setSuccessfulOrderImages] = useState<{ [orderId: string]: string | null }>({});
+
+  // Add state for pending orders count
+  const [pendingOrdersCount, setPendingOrdersCount] = useState<number | null>(null);
+  // Add state for successful orders count
+  const [successfulOrdersCount, setSuccessfulOrdersCount] = useState<number | null>(null);
 
   const categories = [
     'budget-friendly',
@@ -480,22 +503,98 @@ const AdminDashboard = () => {
       setLoadingOrders(true);
       supabase
         .from('orders')
-        .select('id, user_id, amount, status, created_at')
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(5)
-        .then(({ data, error }) => {
-          if (!error && data) setRecentOrders(data);
+        .then(async ({ data, error }) => {
+          if (!error && data) {
+            setRecentOrders(data);
+            // Fetch images for all unique design_nos
+            const images: { [orderId: string]: string | null } = {};
+            for (const order of data) {
+              if (order.design_no) {
+                const { data: designData } = await supabase
+                  .from('designs')
+                  .select('main_image_url')
+                  .eq('design_no', order.design_no)
+                  .single();
+                images[order.id] = designData?.main_image_url || null;
+              } else {
+                images[order.id] = null;
+              }
+            }
+            setRecentOrderImages(images);
+          }
           setLoadingOrders(false);
+        });
+
+      // Fetch total orders count
+      supabase
+        .from('orders')
+        .select('id', { count: 'exact', head: true })
+        .then(({ count, error }) => {
+          if (!error && typeof count === 'number') {
+            setTotalOrdersCount(count);
+          }
+        });
+
+      // Fetch today's orders count
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const todayStr = `${yyyy}-${mm}-${dd}`;
+      supabase
+        .from('orders')
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', `${todayStr}T00:00:00`)
+        .then(({ count, error }) => {
+          if (!error && typeof count === 'number') {
+            setTodayOrdersCount(count);
+          }
+        });
+
+      // Fetch pending orders count
+      supabase
+        .from('orders')
+        .select('id', { count: 'exact', head: true })
+        .eq('work_status', 'pending')
+        .then(({ count, error }) => {
+          if (!error && typeof count === 'number') {
+            setPendingOrdersCount(count);
+          }
+        });
+
+      // Fetch successful orders count
+      supabase
+        .from('orders')
+        .select('id', { count: 'exact', head: true })
+        .eq('work_status', 'successful')
+        .then(({ count, error }) => {
+          if (!error && typeof count === 'number') {
+            setSuccessfulOrdersCount(count);
+          }
+        });
+
+      // Fetch total earnings (sum of price)
+      supabase
+        .from('orders')
+        .select('price')
+        .then(({ data, error }) => {
+          if (!error && data) {
+            const sum = data.reduce((acc: number, order: any) => acc + (order.price || 0), 0);
+            setTotalEarnings(sum);
+          }
         });
     }
   }, [activeAction]);
 
   useEffect(() => {
     if (activeAction === 'home') {
-      // Fetch user count from user_logins table (distinct uuid)
+      // Fetch user count from user_logins table (count distinct id)
       supabase
         .from('user_logins')
-        .select('uuid', { count: 'exact', distinct: true } as any)
+        .select('id', { count: 'exact', head: true })
         .then(({ count, error }) => {
           if (!error && typeof count === 'number') {
             setUserCount(count);
@@ -503,6 +602,130 @@ const AdminDashboard = () => {
         });
     }
   }, [activeAction]);
+
+  useEffect(() => {
+    if (activeAction === 'new') {
+      const fetchTodayOrders = async () => {
+        setLoadingTodayOrders(true);
+        // Get today's date in YYYY-MM-DD format
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const todayStr = `${yyyy}-${mm}-${dd}`;
+        // Fetch orders where created_at >= today 00:00:00
+        const { data, error } = await supabase
+          .from('orders')
+          .select('*')
+          .gte('created_at', `${todayStr}T00:00:00`)
+          .order('created_at', { ascending: false });
+        if (!error && data) {
+          setTodayOrders(data);
+          // Fetch images for all unique design_nos
+          const uniqueDesignNos = Array.from(new Set(data.map((o: any) => o.design_no)));
+          const images: { [orderId: string]: string | null } = {};
+          for (const order of data) {
+            if (order.design_no) {
+              const { data: designData } = await supabase
+                .from('designs')
+                .select('main_image_url')
+                .eq('design_no', order.design_no)
+                .single();
+              images[order.id] = designData?.main_image_url || null;
+            } else {
+              images[order.id] = null;
+            }
+          }
+          setTodayOrderImages(images);
+        }
+        setLoadingTodayOrders(false);
+      };
+      fetchTodayOrders();
+    }
+  }, [activeAction]);
+
+  useEffect(() => {
+    if (activeAction === 'pending') {
+      const fetchPendingOrders = async () => {
+        setLoadingPendingOrders(true);
+        const { data, error } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('work_status', 'pending')
+          .order('created_at', { ascending: false });
+        if (!error && data) {
+          setPendingOrders(data);
+          // Fetch images for all unique design_nos
+          const images: { [orderId: string]: string | null } = {};
+          for (const order of data) {
+            if (order.design_no) {
+              const { data: designData } = await supabase
+                .from('designs')
+                .select('main_image_url')
+                .eq('design_no', order.design_no)
+                .single();
+              images[order.id] = designData?.main_image_url || null;
+            } else {
+              images[order.id] = null;
+            }
+          }
+          setPendingOrderImages(images);
+        }
+        setLoadingPendingOrders(false);
+      };
+      fetchPendingOrders();
+    }
+  }, [activeAction]);
+
+  useEffect(() => {
+    if (activeAction === 'successful') {
+      const fetchSuccessfulOrders = async () => {
+        setLoadingSuccessfulOrders(true);
+        const { data, error } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('work_status', 'successful')
+          .order('created_at', { ascending: false });
+        if (!error && data) {
+          setSuccessfulOrders(data);
+          // Fetch images for all unique design_nos
+          const images: { [orderId: string]: string | null } = {};
+          for (const order of data) {
+            if (order.design_no) {
+              const { data: designData } = await supabase
+                .from('designs')
+                .select('main_image_url')
+                .eq('design_no', order.design_no)
+                .single();
+              images[order.id] = designData?.main_image_url || null;
+            } else {
+              images[order.id] = null;
+            }
+          }
+          setSuccessfulOrderImages(images);
+        }
+        setLoadingSuccessfulOrders(false);
+      };
+      fetchSuccessfulOrders();
+    }
+  }, [activeAction]);
+
+  const handleMarkAsSuccessful = async (orderId: string) => {
+    // Update work_status to 'successful'
+    const { error } = await supabase
+      .from('orders')
+      .update({ work_status: 'successful' })
+      .eq('id', orderId);
+    if (!error) {
+      setPendingOrders(prev => prev.filter(order => order.id !== orderId));
+      setConfirmDialog({ open: false, orderId: null });
+      toast({ title: 'Order marked as successful', className: 'bg-green-50 border-green-200' });
+    } else {
+      toast({ title: 'Error', description: 'Failed to update order status', variant: 'destructive' });
+    }
+  };
+
+  const markSuccessBtnClass = "bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded shadow transition-colors duration-150";
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col md:flex-row">
@@ -531,6 +754,7 @@ const AdminDashboard = () => {
               <Button onClick={() => { setActiveAction('messages'); setSidebarOpen(false); }} className={`justify-start gap-2 w-full ${activeAction === 'messages' ? 'bg-purple-100 text-purple-700' : 'bg-white text-gray-700 hover:bg-purple-50'}`} variant="ghost"><MessageSquare className="h-5 w-5" /> Messages</Button>
               <Button onClick={() => { setActiveAction('stats'); setSidebarOpen(false); }} className={`justify-start gap-2 w-full ${activeAction === 'stats' ? 'bg-purple-100 text-purple-700' : 'bg-white text-gray-700 hover:bg-purple-50'}`} variant="ghost"><BarChart2 className="h-5 w-5" /> Analytics</Button>
               <Button onClick={() => { setActiveAction('edit'); setSidebarOpen(false); }} className={`justify-start gap-2 w-full ${activeAction === 'edit' ? 'bg-purple-100 text-purple-700' : 'bg-white text-gray-700 hover:bg-purple-50'}`} variant="ghost"><Edit className="h-5 w-5" /> Edit Designs</Button>
+              <Button onClick={() => { setActiveAction('new'); setSidebarOpen(false); }} className={`justify-start gap-2 w-full ${activeAction === 'new' ? 'bg-purple-100 text-purple-700' : 'bg-white text-gray-700 hover:bg-purple-50'}`} variant="ghost"><ShoppingCart className="h-5 w-5" /> New Orders</Button>
               <Button onClick={() => { setActiveAction('pending'); setSidebarOpen(false); }} className={`justify-start gap-2 w-full ${activeAction === 'pending' ? 'bg-purple-100 text-purple-700' : 'bg-white text-gray-700 hover:bg-purple-50'}`} variant="ghost"><Clock className="h-5 w-5" /> Pending Orders</Button>
               <Button onClick={() => { setActiveAction('successful'); setSidebarOpen(false); }} className={`justify-start gap-2 w-full ${activeAction === 'successful' ? 'bg-purple-100 text-purple-700' : 'bg-white text-gray-700 hover:bg-purple-50'}`} variant="ghost"><CheckCircle2 className="h-5 w-5" /> Successful Orders</Button>
             </nav>
@@ -546,25 +770,43 @@ const AdminDashboard = () => {
         {/* Dashboard Summary Cards and Home Content */}
         {activeAction === 'home' && (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-              <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center">
-                <div className="text-4xl font-bold text-purple-700">04</div>
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center cursor-pointer transition-transform duration-200 hover:shadow-lg hover:scale-105" onClick={() => setActiveAction('new')}>
+                <div className="text-4xl font-bold text-purple-700">{todayOrdersCount !== null ? todayOrdersCount : <span className='text-gray-400'>...</span>}</div>
                 <div className="text-gray-600 mt-2 font-medium">New Orders</div>
               </div>
-              <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center">
-                <div className="text-4xl font-bold text-orange-500">12</div>
+              <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center cursor-pointer transition-transform duration-200 hover:shadow-lg hover:scale-105" onClick={handleShowPendingOrders}>
+                <div className="text-4xl font-bold text-orange-500">{pendingOrdersCount !== null ? pendingOrdersCount : <span className='text-gray-400'>...</span>}</div>
                 <div className="text-gray-600 mt-2 font-medium">Pending Orders</div>
               </div>
-              <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center">
-                <div className="text-4xl font-bold text-green-600">56</div>
+              <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center cursor-pointer transition-transform duration-200 hover:shadow-lg hover:scale-105" onClick={handleShowSuccessfulOrders}>
+                <div className="text-4xl font-bold text-green-600">{successfulOrdersCount !== null ? successfulOrdersCount : <span className='text-gray-400'>...</span>}</div>
                 <div className="text-gray-600 mt-2 font-medium">Successful Orders</div>
               </div>
-              <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center">
-                <div className="text-2xl font-bold text-gray-800">₹ 22572.78</div>
+              <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center transition-transform duration-200 hover:shadow-lg hover:scale-105">
+                <div className="text-2xl font-bold text-gray-800">₹ {totalEarnings !== null ? totalEarnings.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : <span className='text-gray-400'>...</span>}</div>
                 <div className="text-gray-600 mt-2 font-medium">Total Earnings</div>
               </div>
             </div>
-            {/* Recent Orders Table */}
+            <div className="grid grid-cols-1 gap-4 mb-8 lg:grid-cols-2">
+              <div className="bg-white rounded-lg shadow p-6 flex items-center justify-between">
+                <div className="flex items-center gap-2 text-lg font-medium text-gray-700">
+                  <ShoppingCart className="w-6 h-6 text-purple-700" />
+                  Total Orders:
+                </div>
+                <div className="text-2xl font-bold text-purple-700">
+                  {totalOrdersCount !== null ? totalOrdersCount : <span className='text-gray-400'>...</span>}
+                </div>
+              </div>
+              <div className="bg-white rounded-lg shadow p-6 flex items-center justify-between">
+                <div className="flex items-center gap-2 text-lg font-medium text-gray-700">
+                  <User className="w-6 h-6 text-purple-700" />
+                  Users:
+                </div>
+                <div className="text-2xl font-bold text-purple-700">{userCount !== null ? userCount : <span className='text-gray-400'>...</span>}</div>
+              </div>
+            </div>
+            {/* Move Recent Orders table to the end of Home section */}
             <div className="bg-white rounded-lg shadow p-6 mb-6">
               <h3 className="text-lg font-semibold mb-4 text-gray-800">Recent Orders</h3>
               {loadingOrders ? (
@@ -575,9 +817,12 @@ const AdminDashboard = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Order ID</TableHead>
+                      <TableHead>Order No</TableHead>
+                      <TableHead>Image</TableHead>
                       <TableHead>User ID</TableHead>
-                      <TableHead>Amount</TableHead>
+                      <TableHead>Design No</TableHead>
+                      <TableHead>Quantity</TableHead>
+                      <TableHead>Price</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Date</TableHead>
                     </TableRow>
@@ -585,10 +830,19 @@ const AdminDashboard = () => {
                   <TableBody>
                     {recentOrders.map(order => (
                       <TableRow key={order.id}>
-                        <td className="px-4 py-2">{order.id}</td>
+                        <td className="px-4 py-2 font-mono font-bold text-purple-700">{order.custom_order_id || '-'}</td>
+                        <td className="px-4 py-2">
+                          {recentOrderImages[order.id] ? (
+                            <img src={recentOrderImages[order.id]} alt={order.design_no} className="w-12 h-12 object-cover rounded border" />
+                          ) : (
+                            <span className="text-gray-400">No Image</span>
+                          )}
+                        </td>
                         <td className="px-4 py-2">{order.user_id}</td>
-                        <td className="px-4 py-2">₹ {order.amount}</td>
-                        <td className="px-4 py-2">{order.status}</td>
+                        <td className="px-4 py-2">{order.design_no}</td>
+                        <td className="px-4 py-2">{order.quantity}</td>
+                        <td className="px-4 py-2">₹ {order.price}</td>
+                        <td className="px-4 py-2">{order.payment_status || order.work_status}</td>
                         <td className="px-4 py-2">{new Date(order.created_at).toLocaleString()}</td>
                       </TableRow>
                     ))}
@@ -596,25 +850,70 @@ const AdminDashboard = () => {
                 </Table>
               )}
             </div>
-            <div className="grid grid-cols-1 gap-4 mb-8 lg:grid-cols-2">
-              <div className="bg-white rounded-lg shadow p-6 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-lg font-medium text-gray-700">
-                  <ShoppingCart className="w-6 h-6 text-purple-700" />
-                  Total Orders:
-                </div>
-                <div className="text-2xl font-bold text-purple-700">72</div>
-              </div>
-              <div className="bg-white rounded-lg shadow p-6 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-lg font-medium text-gray-700">
-                  <svg className="w-6 h-6 text-purple-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-5a4 4 0 11-8 0 4 4 0 018 0z" /></svg> Users:
-                </div>
-                <div className="text-2xl font-bold text-purple-700">{userCount !== null ? userCount : <span className='text-gray-400'>...</span>}</div>
-              </div>
-            </div>
           </>
+        )}
+        {/* Back Button for all sections except home */}
+        {activeAction !== 'home' && (
+          <Button
+            variant="outline"
+            className="mb-4 flex items-center gap-2"
+            onClick={() => setActiveAction('home')}
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
         )}
         {/* Main Content Area (forms, tables, etc.) */}
         <div>
+          {activeAction === 'new' && (
+            <Card className="mb-8 p-6 shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-2xl font-semibold text-gray-800">New Orders (Today)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loadingTodayOrders ? (
+                  <div className="text-center text-gray-500 py-4">Loading today's orders...</div>
+                ) : todayOrders.length === 0 ? (
+                  <div className="text-center text-gray-500 py-4">No orders received today.</div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Order No</TableHead>
+                        <TableHead>Image</TableHead>
+                        <TableHead>User ID</TableHead>
+                        <TableHead>Design No</TableHead>
+                        <TableHead>Quantity</TableHead>
+                        <TableHead>Price</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Date</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {todayOrders.map(order => (
+                        <TableRow key={order.id}>
+                          <td className="px-4 py-2 font-mono font-bold text-purple-700">{order.custom_order_id || '-'}</td>
+                          <td className="px-4 py-2">
+                            {todayOrderImages[order.id] ? (
+                              <img src={todayOrderImages[order.id]} alt={order.design_no} className="w-16 h-16 object-cover rounded border" />
+                            ) : (
+                              <span className="text-gray-400">No Image</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-2">{order.user_id}</td>
+                          <td className="px-4 py-2">{order.design_no}</td>
+                          <td className="px-4 py-2">{order.quantity}</td>
+                          <td className="px-4 py-2">₹ {order.price}</td>
+                          <td className="px-4 py-2">{order.payment_status}</td>
+                          <td className="px-4 py-2">{new Date(order.created_at).toLocaleString()}</td>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          )}
           {activeAction === 'upload' && (
             <Card className="mb-8 p-6 shadow-lg">
               <CardHeader>
@@ -942,90 +1241,121 @@ const AdminDashboard = () => {
             </div>
           )}
           {activeAction === 'pending' && (
-            <div className="mt-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-2xl font-bold text-gray-800">Pending Orders</CardTitle>
-                  <p className="text-gray-600">Orders that are pending processing</p>
-                </CardHeader>
-                <CardContent>
-                  {/* TODO: Replace with real data from Supabase */}
+            <Card className="mb-8 p-6 shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-2xl font-semibold text-gray-800">Pending Orders</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loadingPendingOrders ? (
+                  <div className="text-center text-gray-500 py-4">Loading pending orders...</div>
+                ) : pendingOrders.length === 0 ? (
+                  <div className="text-center text-gray-500 py-4">No pending orders found.</div>
+                ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Order ID</TableHead>
+                        <TableHead>Order No</TableHead>
+                        <TableHead>Image</TableHead>
                         <TableHead>User ID</TableHead>
-                        <TableHead>Product</TableHead>
                         <TableHead>Design No</TableHead>
                         <TableHead>Quantity</TableHead>
                         <TableHead>Price</TableHead>
-                        <TableHead>Payment Status</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Action</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {/* Example mock data row */}
-                      <TableRow>
-                        <td className="px-4 py-2">12345</td>
-                        <td className="px-4 py-2">user_abc</td>
-                        <td className="px-4 py-2">
-                          <img src="/public/Assets/Bridal.jpg" alt="Design" className="w-16 h-16 object-cover rounded" />
-                        </td>
-                        <td className="px-4 py-2">DES001</td>
-                        <td className="px-4 py-2">2</td>
-                        <td className="px-4 py-2">₹ 999</td>
-                        <td className="px-4 py-2">
-                          <span className="inline-block px-2 py-1 rounded bg-yellow-100 text-yellow-800 text-xs font-semibold">Pending</span>
-                        </td>
-                      </TableRow>
-                      {/* Add more mock rows as needed */}
+                      {pendingOrders.map(order => (
+                        <TableRow key={order.id}>
+                          <td className="px-4 py-2 font-mono font-bold text-purple-700">{order.custom_order_id || '-'}</td>
+                          <td className="px-4 py-2">
+                            {pendingOrderImages[order.id] ? (
+                              <img src={pendingOrderImages[order.id]} alt={order.design_no} className="w-12 h-12 object-cover rounded border" />
+                            ) : (
+                              <span className="text-gray-400">No Image</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-2">{order.user_id}</td>
+                          <td className="px-4 py-2">{order.design_no}</td>
+                          <td className="px-4 py-2">{order.quantity}</td>
+                          <td className="px-4 py-2">₹ {order.price}</td>
+                          <td className="px-4 py-2">{order.work_status}</td>
+                          <td className="px-4 py-2">{new Date(order.created_at).toLocaleString()}</td>
+                          <td className="px-4 py-2">
+                            <button className={markSuccessBtnClass} onClick={() => setConfirmDialog({ open: true, orderId: order.id })}>
+                              Mark as Successful
+                            </button>
+                          </td>
+                        </TableRow>
+                      ))}
                     </TableBody>
                   </Table>
-                </CardContent>
-              </Card>
-            </div>
+                )}
+                {/* Confirmation Dialog */}
+                {confirmDialog.open && (
+                  <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40">
+                    <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full">
+                      <h2 className="text-lg font-semibold mb-4">Confirm Action</h2>
+                      <p className="mb-6">Are you sure you want to mark this order as successful?</p>
+                      <div className="flex justify-end gap-2">
+                        <Button variant="outline" onClick={() => setConfirmDialog({ open: false, orderId: null })}>Cancel</Button>
+                        <button className={markSuccessBtnClass} onClick={() => confirmDialog.orderId && handleMarkAsSuccessful(confirmDialog.orderId)}>Yes, Mark as Successful</button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           )}
           {activeAction === 'successful' && (
-            <div className="mt-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-2xl font-bold text-gray-800">Successful Orders</CardTitle>
-                  <p className="text-gray-600">Orders that have been completed successfully</p>
-                </CardHeader>
-                <CardContent>
-                  {/* TODO: Replace with real data from Supabase */}
+            <Card className="mb-8 p-6 shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-2xl font-semibold text-gray-800">Successful Orders</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loadingSuccessfulOrders ? (
+                  <div className="text-center text-gray-500 py-4">Loading successful orders...</div>
+                ) : successfulOrders.length === 0 ? (
+                  <div className="text-center text-gray-500 py-4">No successful orders found.</div>
+                ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Order ID</TableHead>
+                        <TableHead>Order No</TableHead>
+                        <TableHead>Image</TableHead>
                         <TableHead>User ID</TableHead>
-                        <TableHead>Product</TableHead>
                         <TableHead>Design No</TableHead>
                         <TableHead>Quantity</TableHead>
                         <TableHead>Price</TableHead>
-                        <TableHead>Payment Status</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Date</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {/* Example mock data row */}
-                      <TableRow>
-                        <td className="px-4 py-2">54321</td>
-                        <td className="px-4 py-2">user_xyz</td>
-                        <td className="px-4 py-2">
-                          <img src="/public/Assets/Exclusive.jpg" alt="Design" className="w-16 h-16 object-cover rounded" />
-                        </td>
-                        <td className="px-4 py-2">DES002</td>
-                        <td className="px-4 py-2">1</td>
-                        <td className="px-4 py-2">₹ 1499</td>
-                        <td className="px-4 py-2">
-                          <span className="inline-block px-2 py-1 rounded bg-green-100 text-green-800 text-xs font-semibold">Paid</span>
-                        </td>
-                      </TableRow>
-                      {/* Add more mock rows as needed */}
+                      {successfulOrders.map(order => (
+                        <TableRow key={order.id}>
+                          <td className="px-4 py-2 font-mono font-bold text-purple-700">{order.custom_order_id || '-'}</td>
+                          <td className="px-4 py-2">
+                            {successfulOrderImages[order.id] ? (
+                              <img src={successfulOrderImages[order.id]} alt={order.design_no} className="w-12 h-12 object-cover rounded border" />
+                            ) : (
+                              <span className="text-gray-400">No Image</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-2">{order.user_id}</td>
+                          <td className="px-4 py-2">{order.design_no}</td>
+                          <td className="px-4 py-2">{order.quantity}</td>
+                          <td className="px-4 py-2">₹ {order.price}</td>
+                          <td className="px-4 py-2">{order.work_status}</td>
+                          <td className="px-4 py-2">{new Date(order.created_at).toLocaleString()}</td>
+                        </TableRow>
+                      ))}
                     </TableBody>
                   </Table>
-                </CardContent>
-              </Card>
-            </div>
+                )}
+              </CardContent>
+            </Card>
           )}
         </div>
       </main>

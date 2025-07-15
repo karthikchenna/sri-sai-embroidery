@@ -105,6 +105,93 @@ export type Database = {
         };
         Relationships: [];
       },
+      user_addresses: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          house_no: string;
+          landmark: string;
+          city: string;
+          district: string;
+          state: string;
+          pincode: string;
+          primary_mobile: string;
+          secondary_mobile: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          house_no: string;
+          landmark?: string;
+          city: string;
+          district: string;
+          state: string;
+          pincode: string;
+          primary_mobile: string;
+          secondary_mobile?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          house_no?: string;
+          landmark?: string;
+          city?: string;
+          district?: string;
+          state?: string;
+          pincode?: string;
+          primary_mobile?: string;
+          secondary_mobile?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      },
+      orders: {
+        Row: {
+          id: string;
+          user_id: string;
+          address_id: string;
+          design_no: string;
+          quantity: number;
+          price: number;
+          payment_status: string;
+          created_at: string;
+          category?: string;
+          custom_order_id?: string;
+          work_status?: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          address_id: string;
+          design_no: string;
+          quantity: number;
+          price: number;
+          payment_status: string;
+          created_at?: string;
+          category?: string;
+          custom_order_id?: string;
+          work_status?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          address_id?: string;
+          design_no?: string;
+          quantity?: number;
+          price?: number;
+          payment_status?: string;
+          created_at?: string;
+          category?: string;
+          custom_order_id?: string;
+          work_status?: string;
+        };
+        Relationships: [];
+      },
     }
     Views: {
       [_ in never]: never
