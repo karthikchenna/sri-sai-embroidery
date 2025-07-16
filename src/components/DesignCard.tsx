@@ -2,6 +2,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useCart } from '@/hooks/useCart';
+import { useUser } from '@/hooks/useUser';
+import { toast } from '@/components/ui/use-toast';
 
 interface Design {
   id: number;
@@ -19,11 +22,31 @@ interface DesignCardProps {
 
 const DesignCard = ({ design }: DesignCardProps) => {
   const navigate = useNavigate();
+  const { addToCart, isLoading } = useCart();
+  const { user } = useUser();
+  const [adding, setAdding] = React.useState(false);
 
   const handleClick = () => {
     // Store the current scroll position using sessionStorage
     sessionStorage.setItem('designsScrollPosition', window.pageYOffset.toString());
     navigate(`/design/${design.id}`);
+  };
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user) {
+      toast({ title: 'Please log in to add to cart', description: 'You must be logged in to add items to your cart.', variant: 'destructive' });
+      return;
+    }
+    setAdding(true);
+    try {
+      await addToCart(design.id, 1);
+      toast({ title: 'Added to cart', description: `Design ${design.design_no} added to your cart.` });
+    } catch (err) {
+      toast({ title: 'Error', description: 'Failed to add to cart', variant: 'destructive' });
+    } finally {
+      setAdding(false);
+    }
   };
 
   // Function to format category name
@@ -44,13 +67,14 @@ const DesignCard = ({ design }: DesignCardProps) => {
           <img
             src={design.main_image_url || 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'}
             alt={design.design_no}
-            className="w-full h-64 object-contain transition-transform duration-300 group-hover:scale-110"
+            className="w-full h-42 lg:h-64 object-contain transition-transform duration-300 group-hover:scale-110"
+            loading="lazy"
           />
           <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300" />
         </div>
         
         <div className="p-4">
-          <h3 className="text-lg font-semibold text-gray-800 mb-0">Design No: {design.design_no}</h3>
+          <h3 className="text-md lg:text-lg font-semibold text-gray-800 mb-0">Design No: {design.design_no}</h3>
           {design.description && <p className="text-md text-gray-600 mb-0">{design.description}</p>}
           <p className="text-md text-gray-600 mb-0 hidden">Stitches: {design.stitches.toLocaleString()}</p>
           <div className="flex justify-between items-center mb-0">
@@ -61,6 +85,13 @@ const DesignCard = ({ design }: DesignCardProps) => {
               ₹ {design.price}
             </Button>
           </div>
+          <Button 
+            className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold"
+            onClick={handleAddToCart}
+            disabled={adding || isLoading}
+          >
+            {adding ? 'Adding...' : 'Add to Cart'}
+          </Button>
         </div>
       </CardContent>
     </Card>

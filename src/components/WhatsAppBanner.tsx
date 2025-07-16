@@ -8,8 +8,11 @@ const WhatsAppBanner = () => {
 
   return (
     <div className="bg-green-600 text-white text-center py-2 flex items-center justify-center space-x-2">
-      <p className="text-sm font-medium">For orders contact us through WhatsApp</p>
-      <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-1 hover:underline">
+      <div className='lg:flex space-x-3'> 
+        <p className="text-sm font-medium">Orders can also be placed through WhatsApp.</p>
+        <p className="text-sm font-medium">వాట్సాప్ ఆర్డర్లు అందుబాటులో ఉన్నాయి!</p>      
+      </div>
+      <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2 hover:underline">
         <BsWhatsapp className="h-4 w-4" />
       </a>
     </div>

@@ -4,28 +4,30 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
-import Index from "./pages/Index";
-import Designs from "./pages/Designs";
-import AboutUs from "./pages/AboutUs";
-import Contact from "./pages/Contact";
-import DesignDetail from "./pages/DesignDetail";
-import AdminDashboard from "./pages/AdminDashboard";
-import NotFound from "./pages/NotFound";
-import FloatingWhatsApp from "./components/FloatingWhatsApp";
-import HelpCenter from "./pages/HelpCenter";
+import React, { Suspense, lazy } from "react";
 import { UserProvider } from '@/hooks/useUser';
 import { CartProvider } from '@/hooks/useCart';
-import Profile from "./pages/Profile";
-import UserAddressForm from "./pages/UserAddressForm";
-import EditUserAddressForm from "./pages/EditUserAddressForm";
-import Cart from "./pages/Cart";
-import AdminLoginPage from "./components/AdminLoginModal";
-import ShippingPolicy from "./pages/ShippingPolicy";
-import ReturnPolicy from "./pages/ReturnPolicy";
-import TermsAndConditions from "./pages/TermsAndConditions";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import Checkout from "./pages/Checkout";
-import Orders from "./pages/Orders";
+
+const Index = lazy(() => import("./pages/Index"));
+const Designs = lazy(() => import("./pages/Designs"));
+const AboutUs = lazy(() => import("./pages/AboutUs"));
+const Contact = lazy(() => import("./pages/Contact"));
+const DesignDetail = lazy(() => import("./pages/DesignDetail"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const FloatingWhatsApp = lazy(() => import("./components/FloatingWhatsApp"));
+const HelpCenter = lazy(() => import("./pages/HelpCenter"));
+const Profile = lazy(() => import("./pages/Profile"));
+const UserAddressForm = lazy(() => import("./pages/UserAddressForm"));
+const EditUserAddressForm = lazy(() => import("./pages/EditUserAddressForm"));
+const Cart = lazy(() => import("./pages/Cart"));
+const AdminLoginPage = lazy(() => import("./components/AdminLoginModal"));
+const ShippingPolicy = lazy(() => import("./pages/ShippingPolicy"));
+const ReturnPolicy = lazy(() => import("./pages/ReturnPolicy"));
+const TermsAndConditions = lazy(() => import("./pages/TermsAndConditions"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const Orders = lazy(() => import("./pages/Orders"));
 
 const queryClient = new QueryClient();
 
@@ -53,7 +55,7 @@ const AppRoutes = () => {
   const isAdminPage = location.pathname === '/admin';
 
   return (
-    <>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-lg">Loading...</div>}>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/designs" element={<Designs />} />
@@ -76,7 +78,7 @@ const AppRoutes = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
       {!isAdminPage && <FloatingWhatsApp />}
-    </>
+    </Suspense>
   );
 };
 

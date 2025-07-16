@@ -26,6 +26,7 @@ const MyOrders: React.FC = () => {
       <div className="flex justify-center items-center min-h-[60vh] bg-gray-50">
         <Card className="p-8 w-full max-w-md shadow-lg">
           <h2 className="text-2xl font-bold mb-6 text-purple-700">My Orders</h2>
+          <p className="text-gray-600 mb-6">Please refresh the page if you don't see recent added items.</p>
           <div className="mb-4 text-gray-600">You have no orders yet.</div>
           <Button onClick={() => navigate(-1)} className="mt-4">Back</Button>
         </Card>

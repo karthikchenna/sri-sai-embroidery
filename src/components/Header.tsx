@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import AuthModal from './AuthModal';
 import { useUser } from '@/hooks/useUser';
 import { toast } from '@/components/ui/sonner';
+import { useCart } from '@/hooks/useCart';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -27,6 +28,7 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useUser();
+  const { cartItemCount } = useCart();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -190,6 +192,16 @@ const Header = () => {
                   )}
                 </form>
               </div>
+
+              {/* Cart Icon with Badge */}
+              <Link to="/cart" className="relative flex items-center">
+                <ShoppingCart className="h-5 w-5 text-gray-700 hover:text-purple-700 transition-colors duration-200" />
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] font-bold rounded-full px-1 py-0.5 min-w-[14px] text-center leading-none">
+                    {cartItemCount}
+                  </span>
+                )}
+              </Link>
 
               {/* User Login Dropdown */}
               <div className="relative" ref={dropdownRef}>

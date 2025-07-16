@@ -58,6 +58,7 @@ const Cart: React.FC = () => {
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
           <Loader2 className="h-8 w-8 animate-spin text-purple-600 mb-4" />
           <p className="text-gray-600">Loading your cart...</p>
+          <p className="text-gray-600 mb-6">Please refresh the page if you don't see recent added items.</p>
         </div>
       </>
     );
@@ -71,7 +72,7 @@ const Cart: React.FC = () => {
           <ShoppingBag className="h-16 w-16 text-gray-400 mb-4" />
           <h2 className="text-2xl font-bold mb-4">Your Cart is Empty</h2>
           <p className="text-gray-600 mb-6">Start shopping to add designs to your cart.</p>
-          <p className="text-gray-600 mb-6">Please refresh the page if you don't see recent added items.</p>
+          {/* <p className="text-gray-600 mb-6">Please refresh the page if you don't see recent added items.</p> */}
           <Button onClick={() => navigate('/designs')} className="bg-purple-600 hover:bg-purple-700">
             Browse Designs
           </Button>
