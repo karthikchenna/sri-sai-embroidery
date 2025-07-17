@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import AuthModal from '@/components/AuthModal';
 import Header from '@/components/Header';
 
 interface Order {
@@ -93,11 +94,16 @@ const Orders: React.FC = () => {
     return <div className="flex justify-center items-center min-h-[40vh]">Loading...</div>;
   }
 
+  const [showAuthModal, setShowAuthModal] = useState(false);
   if (!user) {
-    return <div className="flex flex-col items-center min-h-[40vh]">
-      <p className="mb-4">You are not logged in.</p>
-      <Button onClick={() => navigate('/')}>Go Home</Button>
-    </div>;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <svg width="64" height="64" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="mb-4 text-purple-400"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+        <p className="mb-2 text-lg font-semibold text-gray-700">Sign in to view your orders</p>
+        <Button className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 mt-2" onClick={() => setShowAuthModal(true)}>Login</Button>
+        {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+      </div>
+    );
   }
 
   return (

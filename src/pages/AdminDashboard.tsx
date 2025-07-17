@@ -31,7 +31,7 @@ interface ContactMessage {
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [activeAction, setActiveAction] = useState<'home' | 'upload' | 'messages' | 'stats' | 'edit' | 'pending' | 'successful' | 'new'>('home');
+  const [activeAction, setActiveAction] = useState<'home' | 'upload' | 'messages' | 'stats' | 'edit' | 'pending' | 'successful' | 'new' | 'allOrders'>('home');
   const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);
   const [categoryStats, setCategoryStats] = useState<CategoryStats[]>([]);
   const [totalDesigns, setTotalDesigns] = useState(0);
@@ -93,6 +93,12 @@ const AdminDashboard = () => {
   // Add state for successful orders count
   const [successfulOrdersCount, setSuccessfulOrdersCount] = useState<number | null>(null);
 
+  // Add state for all orders
+  const [allOrders, setAllOrders] = useState<any[]>([]);
+  const [loadingAllOrders, setLoadingAllOrders] = useState(false);
+  // Add state for all order images
+  const [allOrderImages, setAllOrderImages] = useState<{ [orderId: string]: string | null }>({});
+
   const categories = [
     'budget-friendly',
     'exclusive',
@@ -138,6 +144,37 @@ const AdminDashboard = () => {
 
   const handleShowSuccessfulOrders = () => {
     setActiveAction('successful');
+  };
+
+  const handleShowAllOrders = () => {
+    setLoadingAllOrders(true);
+    supabase
+      .from('orders')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .then(async ({ data, error }) => {
+        setLoadingAllOrders(false);
+        if (!error && data) {
+          setAllOrders(data);
+          setActiveAction('allOrders');
+          // Fetch images for all unique design_nos
+          const uniqueDesignNos = Array.from(new Set(data.map((o: any) => o.design_no)));
+          const images: { [orderId: string]: string | null } = {};
+          for (const order of data) {
+            if (order.design_no) {
+              const { data: designData } = await supabase
+                .from('designs')
+                .select('main_image_url')
+                .eq('design_no', order.design_no)
+                .single();
+              images[order.id] = designData?.main_image_url || null;
+            } else {
+              images[order.id] = null;
+            }
+          }
+          setAllOrderImages(images);
+        }
+      });
   };
 
   const fetchMessages = async () => {
@@ -789,7 +826,7 @@ const AdminDashboard = () => {
               </div>
             </div>
             <div className="grid grid-cols-1 gap-4 mb-8 lg:grid-cols-2">
-              <div className="bg-white rounded-lg shadow p-6 flex items-center justify-between">
+              <div className="bg-white rounded-lg shadow p-6 flex items-center justify-between cursor-pointer hover:shadow-lg hover:scale-105 transition-transform duration-200" onClick={handleShowAllOrders}>
                 <div className="flex items-center gap-2 text-lg font-medium text-gray-700">
                   <ShoppingCart className="w-6 h-6 text-purple-700" />
                   Total Orders:
@@ -1348,6 +1385,56 @@ const AdminDashboard = () => {
                           <td className="px-4 py-2">{order.quantity}</td>
                           <td className="px-4 py-2">₹ {order.price}</td>
                           <td className="px-4 py-2">{order.work_status}</td>
+                          <td className="px-4 py-2">{new Date(order.created_at).toLocaleString()}</td>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          )}
+          {/* All Orders Table Section */}
+          {activeAction === 'allOrders' && (
+            <Card className="mb-8 p-6 shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-2xl font-semibold text-gray-800">All Orders</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loadingAllOrders ? (
+                  <div className="text-center text-gray-500 py-4">Loading all orders...</div>
+                ) : allOrders.length === 0 ? (
+                  <div className="text-center text-gray-500 py-4">No orders found.</div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Order No</TableHead>
+                        <TableHead>Image</TableHead>
+                        <TableHead>User ID</TableHead>
+                        <TableHead>Design No</TableHead>
+                        <TableHead>Quantity</TableHead>
+                        <TableHead>Price</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Date</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {allOrders.map(order => (
+                        <TableRow key={order.id}>
+                          <td className="px-4 py-2 font-mono font-bold text-purple-700">{order.custom_order_id || '-'}</td>
+                          <td className="px-4 py-2">
+                            {allOrderImages[order.id] ? (
+                              <img src={allOrderImages[order.id]} alt={order.design_no} className="w-12 h-12 object-cover rounded border" />
+                            ) : (
+                              <span className="text-gray-400">No Image</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-2">{order.user_id}</td>
+                          <td className="px-4 py-2">{order.design_no}</td>
+                          <td className="px-4 py-2">{order.quantity}</td>
+                          <td className="px-4 py-2">₹ {order.price}</td>
+                          <td className="px-4 py-2">{order.payment_status || order.work_status}</td>
                           <td className="px-4 py-2">{new Date(order.created_at).toLocaleString()}</td>
                         </TableRow>
                       ))}

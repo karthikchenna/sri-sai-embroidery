@@ -60,17 +60,34 @@ const Checkout: React.FC = () => {
   }, []);
 
   // Razorpay payment handler
-  const handlePayment = () => {
+  const handlePayment = async () => {
     if (!user || !selectedAddressId || cartItems.length === 0) return;
     setOrderError(null);
     setOrderSuccess(false);
     const totalAmount = cartItems.reduce((sum, item) => sum + (item.design.price || 0) * item.quantity, 0);
+    // 1. Fetch order_id from backend
+    let orderId = '';
+    try {
+      const response = await fetch('http://localhost:5001/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: totalAmount })
+      });
+      const order = await response.json();
+      if (!order.id) throw new Error('Failed to create order');
+      orderId = order.id;
+    } catch (err) {
+      setOrderError('Failed to initiate payment. Please try again.');
+      return;
+    }
+    // 2. Pass order_id to Razorpay
     const options = {
-      key: 'rzp_test_ZrCJYDNBMF4ZtM', // Updated Razorpay test key
-      amount: totalAmount * 100, // in paise
+      key: 'rzp_live_azUJ3aFaelMfEo',
+      amount: totalAmount * 100,
       currency: 'INR',
       name: 'Sri Sai Embroidery',
       description: 'Order Payment',
+      order_id: orderId, // Pass the order_id here
       handler: async function (response: any) {
         setOrderLoading(true);
         setOrderError(null);

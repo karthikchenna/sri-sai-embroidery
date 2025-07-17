@@ -23,7 +23,7 @@ const Footer = () => {
 
   return (
     <>
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 text-white py-12 pb-5 md:pb-0">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Company Info */}
@@ -183,7 +183,7 @@ const Footer = () => {
             </div>
           </div>
 
-          <div className="border-t border-gray-700 mt-8 pt-8 text-center">
+          <div className="border-t border-gray-700 mt-8 pt-8 text-center mb-16 md:mb-0">
             <p className="text-gray-300">
               © 2025 Sri Sai Embroidery. All rights reserved. | <a href="https://karthikchenna.github.io/Portfolio/" className="font-bold  bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent" target="_blank" rel="noopener noreferrer">Created by Karthik</a>
               {/* {new Date().getFullYear()}  */}

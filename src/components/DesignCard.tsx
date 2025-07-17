@@ -74,24 +74,17 @@ const DesignCard = ({ design }: DesignCardProps) => {
         </div>
         
         <div className="p-4">
-          <h3 className="text-md lg:text-lg font-semibold text-gray-800 mb-0">Design No: {design.design_no}</h3>
-          {design.description && <p className="text-md text-gray-600 mb-0">{design.description}</p>}
-          <p className="text-md text-gray-600 mb-0 hidden">Stitches: {design.stitches.toLocaleString()}</p>
-          <div className="flex justify-between items-center mb-0">
-            <p className="text-md text-gray-600">Category: {design.category.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</p>
+          <h3 className="text-md lg:text-lg font-semibold text-gray-800 mb-0">Design #{design.design_no}</h3>
+          <div className="flex flex-col items-start gap-2 md:flex-row md:items-end md:justify-between">
+            <p className="text-lg font-bold text-purple-700">₹{design.price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
             <Button 
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6 pointer-events-none hidden"
+              className="w-full md:w-auto bg-black hover:bg-gray-900 text-white font-semibold px-6 py-2 rounded mt-1 md:mt-0"
+              onClick={handleAddToCart}
+              disabled={adding || isLoading}
             >
-              ₹ {design.price}
+              {adding ? 'Adding...' : 'Add to Cart'}
             </Button>
           </div>
-          <Button 
-            className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold"
-            onClick={handleAddToCart}
-            disabled={adding || isLoading}
-          >
-            {adding ? 'Adding...' : 'Add to Cart'}
-          </Button>
         </div>
       </CardContent>
     </Card>

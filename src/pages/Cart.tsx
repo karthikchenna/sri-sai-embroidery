@@ -84,7 +84,7 @@ const Cart: React.FC = () => {
   // Razorpay demo checkout handler
   const handleCheckout = () => {
     const options = {
-      key: "rzp_test_n3YPzOoCrq26tE", // Provided Razorpay Test Key ID
+      key: "rzp_live_azUJ3aFaelMfEo", // Live Razorpay Key ID
       amount: 50000, // Amount in paise (₹500.00)
       currency: "INR",
       name: "Sri Sai Embroidery",

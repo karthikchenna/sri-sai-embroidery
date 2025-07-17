@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
-import { User as UserIcon, Mail, Phone, BadgeInfo, Home, MapPin, Landmark, Smartphone, Plus, Pencil, Trash2 } from 'lucide-react';
+import { User as UserIcon, Mail, Phone, BadgeInfo, Home, MapPin, Landmark, Smartphone, Plus, Pencil, Trash2, LogOut } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
 
 interface Address {
@@ -22,7 +22,7 @@ interface Address {
 }
 
 const Profile: React.FC = () => {
-  const { user, loading } = useUser();
+  const { user, loading, logout } = useUser();
   const [profile, setProfile] = useState<{ name: string | null; email: string | null; phone: string | null } | null>(null);
   const [fetching, setFetching] = useState(false);
   const [addresses, setAddresses] = useState<Address[] | null>(null);
@@ -105,6 +105,16 @@ const Profile: React.FC = () => {
                   <span className="text-gray-800 break-all">{user.id}</span>
                 </div>
               </div>
+              <Button
+                className="mt-6 w-full flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg shadow"
+                onClick={async () => {
+                  await logout();
+                  toast.success('Logout successful');
+                  navigate('/');
+                }}
+              >
+                <LogOut className="h-5 w-5" /> Logout
+              </Button>
             </div>
             {/* Address Section */}
             <div className="md:w-2/3 w-full p-8 relative">

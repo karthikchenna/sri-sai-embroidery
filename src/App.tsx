@@ -7,6 +7,7 @@ import { Analytics } from "@vercel/analytics/react";
 import React, { Suspense, lazy } from "react";
 import { UserProvider } from '@/hooks/useUser';
 import { CartProvider } from '@/hooks/useCart';
+import BottomNavBar from './components/BottomNavBar';
 
 const Index = lazy(() => import("./pages/Index"));
 const Designs = lazy(() => import("./pages/Designs"));
@@ -41,6 +42,7 @@ const App = () => {
           <CartProvider>
             <BrowserRouter>
               <AppRoutes />
+              <BottomNavBar />
             </BrowserRouter>
           </CartProvider>
         </UserProvider>
