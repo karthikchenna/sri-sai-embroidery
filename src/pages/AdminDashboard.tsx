@@ -99,6 +99,9 @@ const AdminDashboard = () => {
   // Add state for all order images
   const [allOrderImages, setAllOrderImages] = useState<{ [orderId: string]: string | null }>({});
 
+  // 1. Add state to store addresses by address_id
+  const [orderAddresses, setOrderAddresses] = useState<{ [addressId: string]: any }>({});
+
   const categories = [
     'budget-friendly',
     'exclusive',
@@ -764,6 +767,45 @@ const AdminDashboard = () => {
 
   const markSuccessBtnClass = "bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded shadow transition-colors duration-150";
 
+  // 2. Helper to fetch all addresses for a list of orders
+  const fetchAddressesForOrders = async (orders: any[]) => {
+    const addressIds = Array.from(new Set(orders.map((o) => o.address_id)));
+    if (addressIds.length === 0) return;
+    const { data, error } = await supabase
+      .from('user_addresses')
+      .select('*')
+      .in('id', addressIds);
+    if (!error && data) {
+      const addressMap: { [addressId: string]: any } = {};
+      data.forEach((addr) => { addressMap[addr.id] = addr; });
+      setOrderAddresses((prev) => ({ ...prev, ...addressMap }));
+    }
+  };
+
+  // 3. Update useEffects for orders to also fetch addresses
+  useEffect(() => {
+    if (activeAction === 'new' && todayOrders.length > 0) {
+      fetchAddressesForOrders(todayOrders);
+    }
+  }, [activeAction, todayOrders]);
+  useEffect(() => {
+    if (activeAction === 'pending' && pendingOrders.length > 0) {
+      fetchAddressesForOrders(pendingOrders);
+    }
+  }, [activeAction, pendingOrders]);
+  useEffect(() => {
+    if (activeAction === 'successful' && successfulOrders.length > 0) {
+      fetchAddressesForOrders(successfulOrders);
+    }
+  }, [activeAction, successfulOrders]);
+
+  // Ensure addresses are fetched for all orders
+  useEffect(() => {
+    if (activeAction === 'allOrders' && allOrders.length > 0) {
+      fetchAddressesForOrders(allOrders);
+    }
+  }, [activeAction, allOrders]);
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col md:flex-row">
       {/* Mobile Top Bar */}
@@ -903,7 +945,7 @@ const AdminDashboard = () => {
         {/* Main Content Area (forms, tables, etc.) */}
         <div>
           {activeAction === 'new' && (
-            <Card className="mb-8 p-6 shadow-lg">
+            <Card className="mb-8 p-2 shadow-lg">
               <CardHeader>
                 <CardTitle className="text-2xl font-semibold text-gray-800">New Orders (Today)</CardTitle>
               </CardHeader>
@@ -924,27 +966,51 @@ const AdminDashboard = () => {
                         <TableHead>Price</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Date</TableHead>
+                        <TableHead>Delivery Address</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {todayOrders.map(order => (
-                        <TableRow key={order.id}>
-                          <td className="px-4 py-2 font-mono font-bold text-purple-700">{order.custom_order_id || '-'}</td>
-                          <td className="px-4 py-2">
-                            {todayOrderImages[order.id] ? (
-                              <img src={todayOrderImages[order.id]} alt={order.design_no} className="w-16 h-16 object-cover rounded border" />
-                            ) : (
-                              <span className="text-gray-400">No Image</span>
-                            )}
-                          </td>
-                          <td className="px-4 py-2">{order.user_id}</td>
-                          <td className="px-4 py-2">{order.design_no}</td>
-                          <td className="px-4 py-2">{order.quantity}</td>
-                          <td className="px-4 py-2">₹ {order.price}</td>
-                          <td className="px-4 py-2">{order.payment_status}</td>
-                          <td className="px-4 py-2">{new Date(order.created_at).toLocaleString()}</td>
-                        </TableRow>
-                      ))}
+                      {todayOrders.map(order => {
+                        console.log('Order address_id:', order.address_id, 'Available addresses:', Object.keys(orderAddresses));
+                        return (
+                          <TableRow key={order.id}>
+                            <td className="px-4 py-2 font-mono font-bold text-purple-700">{order.custom_order_id || '-'}</td>
+                            <td className="px-4 py-2">
+                              {todayOrderImages[order.id] ? (
+                                <img src={todayOrderImages[order.id]} alt={order.design_no} className="w-16 h-16 object-cover rounded border" />
+                              ) : (
+                                <span className="text-gray-400">No Image</span>
+                              )}
+                            </td>
+                            <td className="px-4 py-2">{order.user_id}</td>
+                            <td className="px-4 py-2">{order.design_no}</td>
+                            <td className="px-4 py-2">{order.quantity}</td>
+                            <td className="px-4 py-2">₹ {order.price}</td>
+                            <td className="px-4 py-2">{order.payment_status}</td>
+                            <td className="px-4 py-2">{new Date(order.created_at).toLocaleString()}</td>
+                            <td className="px-4 py-2 min-w-[200px] max-w-[300px] whitespace-pre-line break-words align-top">
+                              {orderAddresses[order.address_id] ? (
+                                <div className="text-xs text-gray-700 leading-relaxed">
+                                  <div>
+                                    <b>Address:</b><br />
+                                    {orderAddresses[order.address_id].name},<br />
+                                    {orderAddresses[order.address_id].house_no}, {orderAddresses[order.address_id].landmark},<br />
+                                    {orderAddresses[order.address_id].city}, {orderAddresses[order.address_id].district},<br />
+                                    {orderAddresses[order.address_id].state} - {orderAddresses[order.address_id].pincode}
+                                  </div>
+                                  <div className="mt-1">
+                                    <b>Mobile:</b><br />
+                                    {orderAddresses[order.address_id].primary_mobile}
+                                    {orderAddresses[order.address_id].secondary_mobile ? `, ${orderAddresses[order.address_id].secondary_mobile}` : ''}
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="text-gray-400">Not found</span>
+                              )}
+                            </td>
+                          </TableRow>
+                        );
+                      })}
                     </TableBody>
                   </Table>
                 )}
@@ -1278,7 +1344,7 @@ const AdminDashboard = () => {
             </div>
           )}
           {activeAction === 'pending' && (
-            <Card className="mb-8 p-6 shadow-lg">
+            <Card className="mb-8 p-2 shadow-lg">
               <CardHeader>
                 <CardTitle className="text-2xl font-semibold text-gray-800">Pending Orders</CardTitle>
               </CardHeader>
@@ -1299,6 +1365,7 @@ const AdminDashboard = () => {
                         <TableHead>Price</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Date</TableHead>
+                        <TableHead>Delivery Address</TableHead>
                         <TableHead>Action</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -1319,6 +1386,26 @@ const AdminDashboard = () => {
                           <td className="px-4 py-2">₹ {order.price}</td>
                           <td className="px-4 py-2">{order.work_status}</td>
                           <td className="px-4 py-2">{new Date(order.created_at).toLocaleString()}</td>
+                          <td className="px-4 py-2 min-w-[200px] max-w-[300px] whitespace-pre-line break-words align-top">
+                            {orderAddresses[order.address_id] ? (
+                              <div className="text-xs text-gray-700 leading-relaxed">
+                                <div>
+                                  <b>Address:</b><br />
+                                  {orderAddresses[order.address_id].name},<br />
+                                  {orderAddresses[order.address_id].house_no}, {orderAddresses[order.address_id].landmark},<br />
+                                  {orderAddresses[order.address_id].city}, {orderAddresses[order.address_id].district},<br />
+                                  {orderAddresses[order.address_id].state} - {orderAddresses[order.address_id].pincode}
+                                </div>
+                                <div className="mt-1">
+                                  <b>Mobile:</b><br />
+                                  {orderAddresses[order.address_id].primary_mobile}
+                                  {orderAddresses[order.address_id].secondary_mobile ? `, ${orderAddresses[order.address_id].secondary_mobile}` : ''}
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="text-gray-400">Not found</span>
+                            )}
+                          </td>
                           <td className="px-4 py-2">
                             <button className={markSuccessBtnClass} onClick={() => setConfirmDialog({ open: true, orderId: order.id })}>
                               Mark as Successful
@@ -1346,7 +1433,7 @@ const AdminDashboard = () => {
             </Card>
           )}
           {activeAction === 'successful' && (
-            <Card className="mb-8 p-6 shadow-lg">
+            <Card className="mb-8 p-2 shadow-lg">
               <CardHeader>
                 <CardTitle className="text-2xl font-semibold text-gray-800">Successful Orders</CardTitle>
               </CardHeader>
@@ -1367,6 +1454,7 @@ const AdminDashboard = () => {
                         <TableHead>Price</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Date</TableHead>
+                        <TableHead>Delivery Address</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1386,6 +1474,26 @@ const AdminDashboard = () => {
                           <td className="px-4 py-2">₹ {order.price}</td>
                           <td className="px-4 py-2">{order.work_status}</td>
                           <td className="px-4 py-2">{new Date(order.created_at).toLocaleString()}</td>
+                          <td className="px-4 py-2 min-w-[200px] max-w-[300px] whitespace-pre-line break-words align-top">
+                            {orderAddresses[order.address_id] ? (
+                              <div className="text-xs text-gray-700 leading-relaxed">
+                                <div>
+                                  <b>Address:</b><br />
+                                  {orderAddresses[order.address_id].name},<br />
+                                  {orderAddresses[order.address_id].house_no}, {orderAddresses[order.address_id].landmark},<br />
+                                  {orderAddresses[order.address_id].city}, {orderAddresses[order.address_id].district},<br />
+                                  {orderAddresses[order.address_id].state} - {orderAddresses[order.address_id].pincode}
+                                </div>
+                                <div className="mt-1">
+                                  <b>Mobile:</b><br />
+                                  {orderAddresses[order.address_id].primary_mobile}
+                                  {orderAddresses[order.address_id].secondary_mobile ? `, ${orderAddresses[order.address_id].secondary_mobile}` : ''}
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="text-gray-400">Not found</span>
+                            )}
+                          </td>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -1417,27 +1525,52 @@ const AdminDashboard = () => {
                         <TableHead>Price</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Date</TableHead>
+                        <TableHead>Delivery Address</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {allOrders.map(order => (
-                        <TableRow key={order.id}>
-                          <td className="px-4 py-2 font-mono font-bold text-purple-700">{order.custom_order_id || '-'}</td>
-                          <td className="px-4 py-2">
-                            {allOrderImages[order.id] ? (
-                              <img src={allOrderImages[order.id]} alt={order.design_no} className="w-12 h-12 object-cover rounded border" />
-                            ) : (
-                              <span className="text-gray-400">No Image</span>
-                            )}
-                          </td>
-                          <td className="px-4 py-2">{order.user_id}</td>
-                          <td className="px-4 py-2">{order.design_no}</td>
-                          <td className="px-4 py-2">{order.quantity}</td>
-                          <td className="px-4 py-2">₹ {order.price}</td>
-                          <td className="px-4 py-2">{order.payment_status || order.work_status}</td>
-                          <td className="px-4 py-2">{new Date(order.created_at).toLocaleString()}</td>
-                        </TableRow>
-                      ))}
+                      {allOrders.map(order => {
+                        console.log('Order address_id:', order.address_id, 'Available addresses:', Object.keys(orderAddresses));
+                        return (
+                          <TableRow key={order.id}>
+                            <td className="px-4 py-2 font-mono font-bold text-purple-700">{order.custom_order_id || '-'}</td>
+                            <td className="px-4 py-2">
+                              {allOrderImages[order.id] ? (
+                                <img src={allOrderImages[order.id]} alt={order.design_no} className="w-12 h-12 object-cover rounded border" />
+                              ) : (
+                                <span className="text-gray-400">No Image</span>
+                              )}
+                            </td>
+                            <td className="px-4 py-2">{order.user_id}</td>
+                            <td className="px-4 py-2">{order.design_no}</td>
+                            <td className="px-4 py-2">{order.quantity}</td>
+                            <td className="px-4 py-2">₹ {order.price}</td>
+                            <td className="px-4 py-2">{order.payment_status || order.work_status}</td>
+                            <td className="px-4 py-2">{new Date(order.created_at).toLocaleString()}</td>
+                            {/* Delivery Address */}
+                            <td className="px-4 py-2 min-w-[200px] max-w-[300px] whitespace-pre-line break-words align-top">
+                              {orderAddresses[order.address_id] ? (
+                                <div className="text-xs text-gray-700 leading-relaxed">
+                                  <div>
+                                    <b>Address:</b><br />
+                                    {orderAddresses[order.address_id].name},<br />
+                                    {orderAddresses[order.address_id].house_no}, {orderAddresses[order.address_id].landmark},<br />
+                                    {orderAddresses[order.address_id].city}, {orderAddresses[order.address_id].district},<br />
+                                    {orderAddresses[order.address_id].state} - {orderAddresses[order.address_id].pincode}
+                                  </div>
+                                  <div className="mt-1">
+                                    <b>Mobile:</b><br />
+                                    {orderAddresses[order.address_id].primary_mobile}
+                                    {orderAddresses[order.address_id].secondary_mobile ? `, ${orderAddresses[order.address_id].secondary_mobile}` : ''}
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="text-gray-400">Not found</span>
+                              )}
+                            </td>
+                          </TableRow>
+                        );
+                      })}
                     </TableBody>
                   </Table>
                 )}

@@ -23,7 +23,7 @@ const Footer = () => {
 
   return (
     <>
-      <footer className="bg-gray-900 text-white py-12 pb-5 md:pb-0">
+      <footer className="bg-gray-900 text-white py-12 pb-5 md:pb-4">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Company Info */}
@@ -43,7 +43,7 @@ const Footer = () => {
                 <a href="https://www.instagram.com/srisaiembrodiery/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white cursor-pointer">
                   <Instagram className="h-5 w-5" />
                 </a>
-                <a href="tel:+918008105796" className="text-gray-300 hover:text-white cursor-pointer">
+                <a href="tel:+919951452554" className="text-gray-300 hover:text-white cursor-pointer">
                    {/* Using one phone icon for both numbers or primarily the first one here */}
                    <Phone className="h-5 w-5" />
                 </a>
@@ -51,7 +51,7 @@ const Footer = () => {
                    <MapPin className="h-5 w-5" />
                  </a>
                  {/* <a href="https://wa.me/919951455102?text=Hi!%20I%27m%20contacting%20you%20from%20Sri%20Sai%20Embroidery%20website" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white cursor-pointer"> */}
-                 <a href="https://wa.me/919951455102?text=Hi!%20I%27m%20contacting%20you%20via%20the%20Sri%20Sai%20Embroidery%20website%20regarding%20your%20embroidery%20services." target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white cursor-pointer">
+                 <a href="https://wa.me/919951452554?text=Hi!%20I%27m%20contacting%20you%20via%20the%20Sri%20Sai%20Embroidery%20website%20regarding%20your%20embroidery%20services." target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white cursor-pointer">
                    <BsWhatsapp className="h-5 w-5" />
                    
                  </a>
@@ -161,16 +161,11 @@ const Footer = () => {
                     contact.srisaiembroidery@gmail.com
                   </a>
                 </p> */}
-                <p>
-                  <a href="tel:+918008105796" className="hover:text-white flex items-center">
-                    <Phone className="h-5 w-5 mr-2" />
-                    +91 8008105796
-                  </a>
-                </p>
+                
                  <p>
-                  <a href="tel:+919951455102" className="hover:text-white flex items-center">
+                  <a href="tel:+919951452554" className="hover:text-white flex items-center">
                     <Phone className="h-5 w-5 mr-2" />
-                    +91 9951455102
+                    +91 9951452554
                   </a>
                 </p>
                 <p>

@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import AuthModal from '@/components/AuthModal';
 import Header from '@/components/Header';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 interface Order {
   id: string;
@@ -90,6 +92,92 @@ const Orders: React.FC = () => {
     return `${addr.name}, ${addr.house_no}, ${addr.landmark}, ${addr.city}, ${addr.district}, ${addr.state} - ${addr.pincode}, Mobile: ${addr.primary_mobile}${addr.secondary_mobile ? ', ' + addr.secondary_mobile : ''}`;
   };
 
+  const generateInvoice = async (order: Order, address: Address, designImage: string | null) => {
+    const doc = new jsPDF();
+
+    // Logo
+    const logoUrl = '/Assets/Logo.png';
+    const logoImg = new Image();
+    logoImg.src = logoUrl;
+    // Wait for logo to load (async)
+    await new Promise((resolve) => {
+      logoImg.onload = resolve;
+      logoImg.onerror = resolve;
+    });
+    try {
+      doc.addImage(logoImg, 'PNG', 10, 10, 30, 30);
+    } catch (e) {
+      // If logo fails, skip
+    }
+
+    // Business Details
+    doc.setFontSize(14);
+    doc.text('Sri Sai Embroidery', 45, 15);
+    doc.setFontSize(10);
+    doc.text('Beside ZPHS, Sajjapuram', 45, 21);
+    doc.text('Sangareddy, Dist: Telangana, 502148', 45, 26);
+    doc.text('Phone: 9951452554', 45, 31);
+
+    // Invoice/Order Details
+    doc.setFontSize(12);
+    doc.text(`Invoice/Order ID: ${order.custom_order_id || order.id}`, 10, 45);
+    doc.text(`Date: ${new Date(order.created_at).toLocaleDateString()}`, 150, 45, { align: 'right' });
+
+    // Bill To
+    doc.setFontSize(11);
+    doc.text('Bill to:', 10, 55);
+    doc.text(`${address.name}`, 25, 55);
+    doc.text(`Phone: ${address.primary_mobile}${address.secondary_mobile ? ', ' + address.secondary_mobile : ''}`, 25, 60);
+
+    // Shipping Address
+    doc.text('Shipping Address:', 10, 70);
+    doc.setFontSize(10);
+    doc.text(`${address.house_no}, ${address.landmark}`, 25, 75);
+    doc.text(`${address.city}, ${address.district}`, 25, 80);
+    doc.text(`${address.state} - ${address.pincode}`, 25, 85);
+
+    // Order Summary Table
+    autoTable(doc, {
+      startY: 95,
+      head: [['S.No', 'Design No', 'Quantity', 'Price', 'Amount']],
+      body: [
+        [
+          '1',
+          order.design_no,
+          order.quantity,
+          `₹${order.price}`,
+          `₹${order.price * order.quantity}`
+        ]
+      ],
+      theme: 'grid',
+      headStyles: { fillColor: [128, 90, 213] },
+      styles: { fontSize: 10 },
+      columnStyles: {
+        0: { cellWidth: 15 },
+        1: { cellWidth: 35 },
+        2: { cellWidth: 25 },
+        3: { cellWidth: 25 },
+        4: { cellWidth: 30 },
+      },
+      foot: [['', '', '', 'Total', `₹${order.price * order.quantity}`]],
+      footStyles: { fillColor: [240, 240, 240], textColor: [0,0,0], fontStyle: 'bold' },
+    });
+
+    // Note and Thank you
+    let y = (doc as any).autoTable?.previous?.finalY ? (doc as any).autoTable.previous.finalY + 10 : 120;
+    doc.setFontSize(9);
+    doc.text('Note: No returns, refunds or exchange as per policy. For any order-related queries, contact us via WhatsApp: 9951452554', 10, y, { maxWidth: 190 });
+    y += 10;
+    doc.setFontSize(11);
+    doc.text('Thank you for shopping with Sri Sai Embroidery!', 10, y);
+    y += 7;
+    doc.setFontSize(9);
+    doc.text('Follow us for latest designs and offers.', 10, y);
+
+    // Save PDF
+    doc.save(`Invoice_${order.custom_order_id || order.id}.pdf`);
+  };
+
   if (loading) {
     return <div className="flex justify-center items-center min-h-[40vh]">Loading...</div>;
   }
@@ -134,6 +222,15 @@ const Orders: React.FC = () => {
                       <div className="text-gray-700 mb-1">Price: ₹{order.price}</div>
                       <div className="text-gray-700 mb-1">Payment Status: <span className={order.payment_status === 'success' ? 'text-green-600' : 'text-red-600'}>{order.payment_status}</span></div>
                       <div className="text-gray-700 text-sm mt-2">Delivery Address: {getAddress(order.address_id)}</div>
+                      <Button
+                        className="mt-2 bg-purple-600 hover:bg-purple-700 text-white text-xs px-3 py-1 rounded"
+                        onClick={async () => {
+                          const addr = addresses.find(a => a.id === order.address_id);
+                          await generateInvoice(order, addr!, designImages[order.design_no] || null);
+                        }}
+                      >
+                        Download Invoice
+                      </Button>
                     </div>
                   </div>
                 ))}

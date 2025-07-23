@@ -2,7 +2,7 @@ import React from 'react';
 import { BsWhatsapp } from 'react-icons/bs';
 
 const WhatsAppBanner = () => {
-  const whatsappNumber = '+919951455102'; // Replace with your WhatsApp number
+  const whatsappNumber = '+919951452554';
   const whatsappMessage = encodeURIComponent("Hi! I'm contacting you via the Sri Sai Embroidery website regarding an order.");
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
 
