@@ -68,7 +68,8 @@ const Checkout: React.FC = () => {
     // 1. Fetch order_id from backend
     let orderId = '';
     try {
-      const response = await fetch('http://localhost:5001/create-order', {
+      // const response = await fetch('http://localhost:5001/create-order', { // Local host url for payment
+        const response = await fetch('https://backend-payments-gmk7.onrender.com/create-order', { // Deployed URl for Payments from Render
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: totalAmount })
@@ -83,6 +84,7 @@ const Checkout: React.FC = () => {
     // 2. Pass order_id to Razorpay
     const options = {
       key: 'rzp_live_azUJ3aFaelMfEo',
+      // key: process.env.RAZORPAY_KEY_ID,
       amount: totalAmount * 100,
       currency: 'INR',
       name: 'Sri Sai Embroidery',
